@@ -1,5 +1,6 @@
 package app;
 
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
@@ -13,6 +14,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.scene.text.Font;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import javax.swing.*;
@@ -63,14 +65,20 @@ public class GridPaneNIO {
      * @param primaryStage mainStage, which is getting passed by the main class
      */
     GridPaneNIO(Stage primaryStage)  {
+        Screen screen = Screen.getPrimary();
+        Rectangle2D bounds = screen.getVisualBounds();
         this.primaryStage = primaryStage;
+        this.primaryStage.setX(bounds.getMinX());
+        this.primaryStage.setX(bounds.getMinY());
+        this.primaryStage.setWidth(bounds.getWidth());
+        this.primaryStage.setHeight(bounds.getHeight());
         recreateProject();
     }
 
     /**
      * Creates the Stage as well as the layout
      *
-     * @throws FileNotFoundException due to the initialization of files
+     * @throws FileNotFoundException because new files are initialized
      */
     public void start() throws FileNotFoundException {
 
@@ -156,8 +164,9 @@ public class GridPaneNIO {
 
         AtomicReference<TreeItem<CustomItem>> tempTreeItem = new AtomicReference<>();
         treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.getValue().getTextArea() != null) {
+            if (newValue != null) {
                 tempTreeItem.set(newValue);
+                if(newValue.getValue().getTextArea() != null)
                 textArea.setText(newValue.getValue().getTextArea().getText());
             }
         });
@@ -166,7 +175,6 @@ public class GridPaneNIO {
         everytime the text of textArea of a class is getting changed,
          the text in the file is getting updated as well
          */
-
         textArea.textProperty().addListener((observableValue, s, t1) -> {
             tempTreeItem.get().getValue().setText(t1);
             updateFile( tempTreeItem.get().getValue().getTextArea().getText(), tempTreeItem.get().getValue().getPath() );
@@ -178,9 +186,7 @@ public class GridPaneNIO {
             label.setText(tempTreeItem.get().getValue().getLabelText());
         });
 
-
-
-        //scene.getStylesheets().add(getClass().getResource("styles/style.css").toExternalForm());
+        scene.getStylesheets().add("styles/style.css");
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -644,7 +650,7 @@ public class GridPaneNIO {
     private static String getClassContent(String classContent, String className) {
 
         sb.append("public ").append(className).append(" ").append(classContent).append("{").append("\n\n");
-        //if it's the main-class main-method is getting added
+        //if it's the main-class, the main-method-head is getting added
         if (ClassWindow.isSelected)
             sb.append("public static void main (String[] args) {").append("\n\n").append("}").append("\n\n");
         sb.append("}");
@@ -656,7 +662,7 @@ public class GridPaneNIO {
     }
 
     /**
-     * Opens cmd, compiles each files and runs them
+     * Opens cmd, compiles each file and runs them
      *
      */
     public void execute() {

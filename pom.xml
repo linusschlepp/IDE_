@@ -18,6 +18,15 @@
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                <exclude>**/*.bss</exclude>
+                </excludes>
+            </resource>
+        </resources>
     </build>
     <!-- https://mvnrepository.com/artifact/org.openjfx/javafx -->
     <dependencies>

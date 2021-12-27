@@ -1,0 +1,25 @@
+.root{
+
+    -fx-background-color: #ffffff;
+}
+.menu-bar{
+
+    -fx-background-color: #f7fbf5;
+
+}
+
+.text-area{
+    -fx-border-color: #f7fbf5;
+}
+
+.tree-view{
+    -fx-background-color: beige;
+
+}
+
+
+
+.text-flow{
+    -fx-background-color: #f7fbf5 ;
+
+}

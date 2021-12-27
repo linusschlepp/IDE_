@@ -4,7 +4,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 
-
+/**
+ * Represents the layout of the classes and packages within the TreeView
+ *
+ */
 public class CustomItem extends GridPane {
 
     private final Label boxText;

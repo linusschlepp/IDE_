@@ -39,9 +39,11 @@ public class ClassWindow {
                 GridPane.setConstraints(checkBox, 0, 2);
                 grdPane.getChildren().add(checkBox);
             }
+            //if no packages exist, the dropdown will not be displayed
             if (GridPaneNIO.packageNameHashMap.isEmpty()) {
                 GridPane.setConstraints(button, 0, 3);
                 grdPane.getChildren().addAll( label, textField, button);
+            //if packages exist, the dropdown will be filled with the contents of the packageNameHashMap
             } else {
                 for (String s : GridPaneNIO.packageNameHashMap.keySet())
                     comboBox.getItems().add(s);
@@ -55,9 +57,10 @@ public class ClassWindow {
             window.show();
 
             button.setOnAction(e -> {
+                //checks if the class is Main
                 isSelected = checkBox.isSelected();
                 String selectedValue = comboBox.getValue();
-
+                //Exception need to be caught, because addToPackage, addPackage and addClass are throwing IOExceptions
                 try {
                     if (selectedValue != null)
                         GridPaneNIO.addToPackage(selectedValue, textField.getText(), classKind);
@@ -70,7 +73,7 @@ public class ClassWindow {
                 }
                 window.close();
             });
-            //is path does not exist the AlertBox will be displayed
+            //if the path is empty the AlertBox will be displayed
         }else
             AlertBox.display();
 

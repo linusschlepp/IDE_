@@ -33,7 +33,7 @@ public enum ClassType {
         @Override
         public ImageView getImage() {
             try {
-                return  new ImageView(new Image(new FileInputStream(getRelativePath() +  File.separator + "pictures/classpicture.png")));
+                return new ImageView(new Image(new FileInputStream(getRelativePath() +  File.separator + "pictures/classpicture.png")));
             }
             catch (IOException e){
                 return null;
