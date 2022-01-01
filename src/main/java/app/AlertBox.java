@@ -5,7 +5,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.layout.Region;
 
 /**
- * Gets displayed if the project-path is empty
+ * Gets displayed if the project-path is empty/ undefined
  *
  */
 public class AlertBox {

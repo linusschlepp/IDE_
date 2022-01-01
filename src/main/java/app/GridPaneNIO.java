@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static app.ClassType.*;
 
@@ -194,8 +195,9 @@ public class GridPaneNIO {
     }
 
     /**
+     *Returns the path, where the IDE is stored
      *
-     * @return relativePath of the stored files
+     * @return relativePath of the IDE
      */
     public static String getRelativePath() {
 
@@ -295,6 +297,12 @@ public class GridPaneNIO {
         textAreaStringHashMap.put(tArea, file.getName().replaceAll(".java", ""));
     }
 
+    /**
+     * Returns the content of a file as a String variable
+     *
+     * @param file the file, which content is needed
+     * @return content of file-parameter as String
+     */
     private static String getClassContent(File file) {
         StringBuilder sb = new StringBuilder();
         try {
@@ -314,7 +322,7 @@ public class GridPaneNIO {
      * @param classKind kind of the class enum, interface etc.
      * @param file individual file
      */
-    public static void addToPackage1(String packageName, String filePath,  String className, ClassType classKind, File file)  {
+    public static void addToPackage(String packageName, String filePath, String className, ClassType classKind, File file)  {
 
         TreeItem<CustomItem> treeItem;
         if (classKind.equals(PACKAGE)) {
@@ -336,6 +344,11 @@ public class GridPaneNIO {
 
     }
 
+    /**
+     * Adds package, but only to the TreeView and not in the file system
+     *
+     * @param packageName name of the package
+     */
     public static void addPackage1(String packageName) {
 
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(PACKAGE.getImage(), new Label(packageName)));
@@ -348,7 +361,7 @@ public class GridPaneNIO {
      * Recreates last used project
      *
      */
-    private static void recreateProject(){
+    private static void recreateProject()  {
         //if the project exists it gets added and recreated
         if(getProjectPath() != null) {
             addProject(getProjectPath());
@@ -368,14 +381,15 @@ public class GridPaneNIO {
                             if (entry.isDirectory() && !entry.getName().equals("output"))
                                 addPackage1(entry.getName());
                             else if(entry.isFile() && !entry.getName().equals("output"))
-                                addClass(entry, CLASS);
+                             //   addClass(entry, CLASS);
+                                addClass(entry, checkForClassType(entry));
                         } else {
                             if (entry.isDirectory() && !entry.getName().equals("output"))
                                 // addToPackage1(new File(entry.getParent()).getName(), entry.getName(), PACKAGE, entry);
-                                addToPackage1(new File(entry.getParent()).getName(),
+                                addToPackage(new File(entry.getParent()).getName(),
                                         entry.getPath(), entry.getName(), PACKAGE, entry);
                             else
-                                addToPackage1(new File(entry.getParent()).getName(), entry.getPath(),
+                                addToPackage(new File(entry.getParent()).getName(), entry.getPath(),
                                         entry.getName().replaceAll(".java", ""), CLASS, entry);
                         }
 
@@ -386,14 +400,43 @@ public class GridPaneNIO {
             }
         } else {
             if (file.getPath().equals(path)) {
-                addClass(file, CLASS);
+             //   addClass(file, CLASS);
+                addClass(file, checkForClassType(file));
             } else {
                 // addToPackage1(new File(file.getParent()).getName(), file.getName().replaceAll(".java", ""), CLASS, file);
-                addToPackage1(new File(file.getParent()).getName(), file.getPath(),
+                addToPackage(new File(file.getParent()).getName(), file.getPath(),
                         file.getName().replaceAll(".java", ""), CLASS, file);
             }
 
         }
+    }
+
+    /**
+     * Determines the class-type by checking the content of the files for the keywords: enum, interface and class
+     *
+     * @param entry file, which is getting checked
+     * @return the corresponding classType
+     */
+    private static ClassType checkForClassType(File entry) {
+
+        try {
+         String s  =   Files.lines(Paths.get(entry.getPath())).collect(Collectors.toList()).toString();
+
+                if (s.contains("class"))
+                    return CLASS;
+                if (s.contains("enum"))
+                    return ENUM;
+                if (s.contains("interface"))
+                    return INTERFACE;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return CLASS;
+
+
     }
 
     /**

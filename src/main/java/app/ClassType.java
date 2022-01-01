@@ -89,7 +89,7 @@ public enum ClassType {
             }
         }
     };
-    //returns the type of class as String
+    //returns the type of class as a String
     public abstract String getClassType();
     //returns corresponding image for class-type
     public abstract ImageView getImage();
