@@ -370,6 +370,11 @@ public class GridPaneNIO {
 
     }
 
+    /**
+     * Recreates the Project-structure in the TreeView by the given link
+     *
+     * @param file represents the project structure or is the project
+     */
     private static void recreateRecProject(File file)  {
 
         if (file.isDirectory()) {
@@ -494,7 +499,7 @@ public class GridPaneNIO {
     }
 
     /**
-     * Opens fileDialog window and saves  the project in the requested location
+     * Opens fileDialog window and saves in the project in the requested location
      *
      * @throws IOException NIO code-segments are getting used
      */
@@ -525,7 +530,11 @@ public class GridPaneNIO {
         treeView.setRoot(TreeItemProject);
     }
 
-
+    /**
+     * It just adds the project to the TreeView and creates the whole layout
+     *
+     * @param currentPath path, of the project, which is getting recreated in the TreeView
+     */
     private static void addProject(File currentPath) {
         path = currentPath.getPath();
         fileName = currentPath.getName();
@@ -630,7 +639,14 @@ public class GridPaneNIO {
         }
     }
 
-
+    /**
+     * Adds the class headers to the individual TextAreas e.g. package1.package2 by analyzing the filestructures of the files;
+     *
+     * @param packageName name of the packages which are getting added
+     * @param className name of the class/enum or interface
+     * @param classKind classKind e.g. enum
+     * @return instance of TextArea with corresponding content
+     */
     private static TextArea generateTextAreaContent(String packageName, String className, ClassType classKind) {
         TreeItem<CustomItem> dummyItem = new TreeItem<>();
         packageNameHashMap.get(packageName).getChildren().add(dummyItem);

@@ -7,6 +7,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+/**
+ * Returns the image and name of the individual instances of the TextArea and FileSystem in a type-safe manner
+ *
+ */
 public enum ClassType {
 
 
@@ -89,7 +93,7 @@ public enum ClassType {
             }
         }
     };
-    //returns the type of class as a String
+    //returns the type of class (class, enum, project, interface, package)  as a String
     public abstract String getClassType();
     //returns corresponding image for class-type
     public abstract ImageView getImage();

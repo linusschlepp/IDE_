@@ -17,9 +17,9 @@ public class CustomItem extends GridPane {
 
 
     /**
-     * Constructor
+     * 1st Constructor
      *
-     * @param imageView image is getting passed by GridPaneNIO
+     * @param imageView corresponding image of class, package, enum or interface
      * @param boxText name of class/ package
      */
     public CustomItem(ImageView imageView, Label boxText) {
@@ -35,7 +35,14 @@ public class CustomItem extends GridPane {
 
     }
 
-
+    /**
+     * 2nd Constructor
+     *
+     * @param imageView corresponding image of class, package, enum or interface
+     * @param boxText name of class/ package
+     * @param textArea textArea corresponding to interface, class or enum
+     * @param path path of the instances within the filesystem
+     */
     public CustomItem(ImageView imageView, Label boxText, TextArea textArea, String path){
         this.imageView = imageView;
         this.boxText = boxText;
