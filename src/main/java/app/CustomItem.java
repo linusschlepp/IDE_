@@ -14,6 +14,7 @@ public class CustomItem extends GridPane {
     private TextArea textArea;
     private final ImageView imageView;
     private String path;
+    private ClassType classType;
 
 
     /**
@@ -22,9 +23,10 @@ public class CustomItem extends GridPane {
      * @param imageView corresponding image of class, package, enum or interface
      * @param boxText name of class/ package
      */
-    public CustomItem(ImageView imageView, Label boxText) {
+    public CustomItem(ImageView imageView, Label boxText, ClassType classType) {
         this.imageView = imageView;
         this.boxText = boxText;
+        this.classType = classType;
 
 
         imageView.setFitHeight(15);
@@ -43,11 +45,12 @@ public class CustomItem extends GridPane {
      * @param textArea textArea corresponding to interface, class or enum
      * @param path path of the instances within the filesystem
      */
-    public CustomItem(ImageView imageView, Label boxText, TextArea textArea, String path){
+    public CustomItem(ImageView imageView, Label boxText, TextArea textArea, String path, ClassType classType){
         this.imageView = imageView;
         this.boxText = boxText;
         this.textArea = textArea;
         this.path = path;
+        this.classType = classType;
 
         imageView.setFitHeight(20);
         imageView.setPreserveRatio(true);
@@ -70,7 +73,13 @@ public class CustomItem extends GridPane {
     }
 
 
+    public ImageView getImageView() {
+        return imageView;
+    }
 
+    public ClassType getClassType() {
+        return classType;
+    }
 
     public String getLabelText(){
         return boxText.getText();

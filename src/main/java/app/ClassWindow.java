@@ -14,6 +14,7 @@ import static app.ClassType.*;
 public class ClassWindow {
 
     static boolean isSelected = false;
+    static ComboBox<String> comboBox = new ComboBox<>();
 
     public static void display(ClassType classKind, boolean isPackage) {
 
@@ -21,7 +22,7 @@ public class ClassWindow {
         if (!GridPaneNIO.path.isEmpty()) {
 
             CheckBox checkBox = new CheckBox("is Main?");
-            ComboBox<String> comboBox = new ComboBox<>();
+
             GridPane grdPane = new GridPane();
             grdPane.setPadding(new Insets(8, 8, 8, 8));
             grdPane.setVgap(8);
