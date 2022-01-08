@@ -10,6 +10,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
@@ -95,10 +96,12 @@ public class GridPaneNIO {
         menuExecute.setGraphic(viewMenu);
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
+        menuItemExec1.setAccelerator(KeyCombination.keyCombination("Ctrl+R"));
         menuItemExec1.setOnAction(e -> execute());
 
         viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator  + "pictures/terminate.png")));
         menuClose.setGraphic(viewMenu);
+        menuItemClose1.setAccelerator(KeyCombination.keyCombination("Ctrl+T"));
         menuItemClose1.setOnAction(e -> primaryStage.close());
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
@@ -109,21 +112,25 @@ public class GridPaneNIO {
         viewMenuItem.setFitHeight(30);
         viewMenuItem.setPreserveRatio(true);
         menuAdd.setGraphic(viewMenu);
+        menuItemAddClass.setAccelerator(KeyCombination.keyCombination("Ctrl+K"));
         menuItemAddClass.setOnAction(e -> ClassWindow.display(CLASS, false));
         menuItemAddClass.setGraphic(viewMenuItem);
         viewMenuItem = INTERFACE.getImage();
         viewMenuItem.setFitHeight(30);
         viewMenuItem.setPreserveRatio(true);
+        menuItemAddInterface.setAccelerator(KeyCombination.keyCombination("Ctrl+I"));
         menuItemAddInterface.setGraphic(viewMenuItem);
         menuItemAddInterface.setOnAction(e -> ClassWindow.display(INTERFACE, false));
         viewMenuItem = ENUM.getImage();
         viewMenuItem.setFitHeight(30);
         viewMenuItem.setPreserveRatio(true);
+        menuItemAddEnum.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
         menuItemAddEnum.setGraphic(viewMenuItem);
         menuItemAddEnum.setOnAction(e -> ClassWindow.display(ENUM, false));
         viewMenuItem = PACKAGE.getImage();
         viewMenuItem.setFitHeight(17);
         viewMenuItem.setPreserveRatio(true);
+        menuItemAddPackage.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
         menuItemAddPackage.setGraphic(viewMenuItem);
         menuItemAddPackage.setOnAction(e -> ClassWindow.display(PACKAGE, true));
         viewMenu.setFitHeight(20);
@@ -139,6 +146,7 @@ public class GridPaneNIO {
         viewMenuItem = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator  + "pictures/projectpicture.png")));
         viewMenuItem.setFitHeight(17);
         viewMenuItem.setPreserveRatio(true);
+        menuItemAddProject.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
         menuItemAddProject.setGraphic(viewMenuItem);
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(menuAdd, menuExecute, menuClose);
@@ -151,6 +159,7 @@ public class GridPaneNIO {
         GridPane.setRowSpan(label, 1);
         gridPane.add(textArea, 1, 2);
         Scene scene = new Scene(gridPane, 800, 800);
+        menuItemSelectProject.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         menuItemSelectProject.setOnAction(e -> {
             try {
                 selectProject();
@@ -228,7 +237,10 @@ public class GridPaneNIO {
     /**
      * Opens File-Explorer and selects location of the project
      *
-     * @throws FileNotFoundException NIO-codesegments are getting used
+     * @throws FileNotFoundException
+     * NIO-codesegments are getting used
+     * @throws NullPointerException
+     * when no project path is getting chosen
      */
     private static void selectProject() throws FileNotFoundException {
 
