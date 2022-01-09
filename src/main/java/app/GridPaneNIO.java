@@ -41,7 +41,7 @@ public class GridPaneNIO {
 
     ClassType valueRename3;
     String valueRename1;
-    String valueRename2;
+    TreeItem<CustomItem>retTreeItem;
     static StringBuilder sb = new StringBuilder();
     static TextFlow textFlow = new TextFlow();
     static String path = "";
@@ -59,6 +59,7 @@ public class GridPaneNIO {
     MenuItem menuItemAddPackage = new MenuItem("Add Package");
     MenuItem menuItemAddProject = new MenuItem("New Project");
     MenuItem menuItemSelectProject = new MenuItem("Select Project");
+    MenuItem menuItemDelete = new MenuItem("Delete");
     MenuItem menuItemRename = new MenuItem("Rename");
     static GridPane gridPane = new GridPane();
     static TreeItem<CustomItem> TreeItemProject;
@@ -115,6 +116,9 @@ public class GridPaneNIO {
         viewMenu.setPreserveRatio(true);
         menuItemRename.setOnAction(e -> RenameBox.display(getValueRename1(), getValueRename3()));
 
+
+        menuItemDelete.setOnAction(e -> DeleteBox.display(getRetTreeItem().getValue().getLabelText(),
+                getRetTreeItem().getValue().getPath(), getRetTreeItem().getValue().getClassType()));
         ImageView viewMenuItem = CLASS.getImage();
         viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/plus.png")));
         viewMenuItem.setFitHeight(30);
@@ -188,10 +192,10 @@ public class GridPaneNIO {
             //to avoid the addition of too many menuItems within the contextMenu
             if(contextMenuPackages.getItems().size() == 0 && contextMenuClasses.getItems().size() == 0) {
                 //menuItems get added to contextMenuPackages
-                contextMenuPackages.getItems().addAll(copyMenuItem(menuItemAddInterface),  copyMenuItem(menuItemAddEnum),
-                        copyMenuItem(menuItemAddPackage), copyMenuItem(menuItemRename));
+                contextMenuPackages.getItems().addAll(copyMenuItem(menuItemAddClass), copyMenuItem(menuItemAddInterface),  copyMenuItem(menuItemAddEnum),
+                        copyMenuItem(menuItemAddPackage), copyMenuItem(menuItemRename), copyMenuItem(menuItemDelete));
                 //menuItems get added to contextMenuClasses
-                contextMenuClasses.getItems().addAll(copyMenuItem(menuItemRename));
+                contextMenuClasses.getItems().addAll(copyMenuItem(menuItemRename), copyMenuItem(menuItemDelete));
             }
             if (newValue != null) {
                 tempTreeItem.set(newValue);
@@ -205,8 +209,8 @@ public class GridPaneNIO {
                 //set name of class, which has to be renamed
                 setValueRename1(tempTreeItem.get().getValue().getLabelText());
                 //set classType of class, which has to be renamed
-                setValueRename2(tempTreeItem.get().getValue().getClassType().getClassType());
                 setValueRename3(tempTreeItem.get().getValue().getClassType());
+                setRetTreeItem(tempTreeItem.get());
                 if (tempTreeItem.get().getValue().getClassType().equals(PACKAGE) ||
                         tempTreeItem.get().getValue().getClassType().equals(PROJECT)) {
                     contextMenuPackages.show(tempTreeItem.get().getValue(), e.getScreenX(), e.getScreenY());
@@ -219,6 +223,9 @@ public class GridPaneNIO {
 
             });
         });
+
+
+
 
 
         /*
@@ -663,7 +670,7 @@ public class GridPaneNIO {
      */
     public static void addPackage(String packageName, File file) throws IOException {
 
-
+        System.out.println(path);
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(PACKAGE.getImage(), new Label(packageName), PACKAGE, file.getPath()));
         packageNameHashMap.put(packageName, treeItem);
         if (!Files.exists(Paths.get(path + File.separator + packageName)))
@@ -938,20 +945,24 @@ public class GridPaneNIO {
         this.valueRename1 = valueRename1;
     }
 
-    public String getValueRename2() {
-        return valueRename2;
-    }
-    //needed for renaming purposes, represents type of class (package, class, enum or interface)
-    public void setValueRename2(String valueRename2) {
-        this.valueRename2 = valueRename2;
-    }
 
 
+    //needed for renaming purposes, represents ClassType, which is getting changed
     public ClassType getValueRename3() {
         return valueRename3;
     }
 
+
     public void setValueRename3(ClassType valueRename3) {
         this.valueRename3 = valueRename3;
+    }
+
+
+    public TreeItem<CustomItem> getRetTreeItem() {
+        return retTreeItem;
+    }
+
+    public void setRetTreeItem(TreeItem<CustomItem> retTreeItem) {
+        this.retTreeItem = retTreeItem;
     }
 }

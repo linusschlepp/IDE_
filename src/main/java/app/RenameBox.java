@@ -7,13 +7,15 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * This dialog-box gets shown if files/ directories have to be renamed
+ *
+ */
 public class RenameBox {
 
     public static void display(String className, ClassType classType) {
@@ -35,8 +37,10 @@ public class RenameBox {
         window.setScene(new Scene(grdPane, 300, 300));
         window.show();
 
+        //button initiates renaming process
         button.setOnAction(e -> {
 
+            // if the required TreeItem is of classType package
             if(classType.equals(ClassType.PACKAGE)) {
                 //Searches in the HashMap and changes value (TreeItem) Label to the new input of the user
                 GridPaneNIO.packageNameHashMap.forEach((k, v) -> {
@@ -53,23 +57,24 @@ public class RenameBox {
             }
             //if object to rename is class/ enum or interface
             else{
-                    GridPaneNIO.findFilesRec(new File(GridPaneNIO.path));
-                    GridPaneNIO.listFiles.forEach(f -> {
-                        System.out.println(f.getName().replaceAll(".java", ""));
-                        if (f.getName().replaceAll(".java", "").equals(className)) {
-                            Path source = Paths.get(f.getPath());
+                //TODO: This does not work, maybe implement HashTree in GridPaneNIO which contains all single files and then implement same logic as for directories
+                GridPaneNIO.TreeItemProject.getChildren().forEach(l ->{
+                            System.out.println(l.getValue().getLabelText());
+                   if( l.getValue().getLabelText().equals(className)){
+                       Path source = Paths.get(l.getValue().getPath());
                             try {
                                 Files.move(source, source.resolveSibling(textField.getText()));
                             } catch (IOException ex) {
                                 ex.printStackTrace();
                             }
                         }
-                    });
+                   }
+
+                        );
                 }
 
             window.close();
 
     });
     }
-
 }

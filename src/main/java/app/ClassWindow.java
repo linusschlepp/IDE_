@@ -4,13 +4,18 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
+import java.io.File;
 import java.io.IOException;
 
 
 import static app.ClassType.*;
 
 
-
+/**
+ * Gets displayed, if new classes/ packages are added to the TreeView
+ * Enables user to select name location of the file (package-hierachy)
+ */
 public class ClassWindow {
 
     static boolean isSelected = false;
@@ -70,7 +75,7 @@ public class ClassWindow {
                         GridPaneNIO.addClass(textField.getText(), classKind);
                     else
                         // if is Package is true, we add a Package to the filesystem as well as to the TreeView
-                        GridPaneNIO.addPackage(textField.getText(), null);
+                        GridPaneNIO.addPackage(textField.getText(), new File(GridPaneNIO.path+"\\"+textField.getText()));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
