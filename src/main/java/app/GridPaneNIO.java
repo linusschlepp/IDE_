@@ -116,9 +116,12 @@ public class GridPaneNIO {
         viewMenu.setPreserveRatio(true);
         menuItemRename.setOnAction(e -> RenameBox.display(getValueRename1(), getValueRename3()));
 
-
+        viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/terminate.png")));
+        menuItemDelete.setGraphic(viewMenu);
         menuItemDelete.setOnAction(e -> DeleteBox.display(getRetTreeItem().getValue().getLabelText(),
                 getRetTreeItem().getValue().getPath(), getRetTreeItem().getValue().getClassType()));
+        viewMenu.setFitHeight(20);
+        viewMenu.setPreserveRatio(true);
         ImageView viewMenuItem = CLASS.getImage();
         viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/plus.png")));
         viewMenuItem.setFitHeight(30);
