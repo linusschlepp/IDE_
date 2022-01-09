@@ -64,13 +64,13 @@ public class ClassWindow {
                 //Exception needs to be caught, because addToPackage, addPackage and addClass are throwing IOExceptions
                 try {
                     if (selectedValue != null)
-                        GridPaneNIO.addToPackage(selectedValue, textField.getText(), classKind);
+                        GridPaneNIO.addToPackage(selectedValue, textField.getText(), classKind, null);
                     else if (!isPackage)
                         //if isPackage is false, we just add a Class to the filesystem as well as to the TreeView
                         GridPaneNIO.addClass(textField.getText(), classKind);
                     else
                         // if is Package is true, we add a Package to the filesystem as well as to the TreeView
-                        GridPaneNIO.addPackage(textField.getText());
+                        GridPaneNIO.addPackage(textField.getText(), null);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

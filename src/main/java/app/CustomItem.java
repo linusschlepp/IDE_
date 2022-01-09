@@ -23,10 +23,11 @@ public class CustomItem extends GridPane {
      * @param imageView corresponding image of class, package, enum or interface
      * @param boxText name of class/ package
      */
-    public CustomItem(ImageView imageView, Label boxText, ClassType classType) {
+    public CustomItem(ImageView imageView, Label boxText, ClassType classType, String path) {
         this.imageView = imageView;
         this.boxText = boxText;
         this.classType = classType;
+        this.path = path;
 
 
         imageView.setFitHeight(15);
@@ -66,9 +67,12 @@ public class CustomItem extends GridPane {
         return boxText;
     }
 
+    public void setBoxText(String text){
+        this.boxText.setText(text);
+    }
+
 
     public TextArea getTextArea(){
-
         return textArea;
     }
 

@@ -39,7 +39,7 @@ public class GridPaneNIO {
     Stage primaryStage;
 
 
-
+    ClassType valueRename3;
     String valueRename1;
     String valueRename2;
     static StringBuilder sb = new StringBuilder();
@@ -113,7 +113,7 @@ public class GridPaneNIO {
         menuItemClose1.setOnAction(e -> primaryStage.close());
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
-        menuItemRename.setOnAction(e -> RenameBox.display(getValueRename1(), getValueRename2()));
+        menuItemRename.setOnAction(e -> RenameBox.display(getValueRename1(), getValueRename3()));
 
         ImageView viewMenuItem = CLASS.getImage();
         viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/plus.png")));
@@ -206,6 +206,7 @@ public class GridPaneNIO {
                 setValueRename1(tempTreeItem.get().getValue().getLabelText());
                 //set classType of class, which has to be renamed
                 setValueRename2(tempTreeItem.get().getValue().getClassType().getClassType());
+                setValueRename3(tempTreeItem.get().getValue().getClassType());
                 if (tempTreeItem.get().getValue().getClassType().equals(PACKAGE) ||
                         tempTreeItem.get().getValue().getClassType().equals(PROJECT)) {
                     contextMenuPackages.show(tempTreeItem.get().getValue(), e.getScreenX(), e.getScreenY());
@@ -327,7 +328,7 @@ public class GridPaneNIO {
         pathText.setFont(Font.font("verdana", FontPosture.REGULAR, 15));
 
         textFlow.getChildren().addAll(projectText, pathText);
-        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(f.getSelectedFile().getName()), PROJECT));
+        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(f.getSelectedFile().getName()), PROJECT, path));
         treeView.setRoot(TreeItemProject);
         recreateRecProject(new File(path));
 
@@ -393,7 +394,7 @@ public class GridPaneNIO {
 
         TreeItem<CustomItem> treeItem;
         if (classKind.equals(PACKAGE)) {
-            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), PACKAGE));
+            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), PACKAGE, file.getPath()));
             packageNameHashMap.put(className, treeItem);
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
         } else {
@@ -416,9 +417,9 @@ public class GridPaneNIO {
      *
      * @param packageName name of the package
      */
-    public static void addPackage1(String packageName) {
+    public static void addPackage1(String packageName, File file) {
 
-        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(PACKAGE.getImage(), new Label(packageName), PACKAGE));
+        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(PACKAGE.getImage(), new Label(packageName), PACKAGE, file.getPath()));
         packageNameHashMap.put(packageName, treeItem);
         TreeItemProject.getChildren().add(treeItem);
 
@@ -450,7 +451,7 @@ public class GridPaneNIO {
                     for (File entry : entries) {
                         if (file.getPath().equals(path)) {
                             if (entry.isDirectory() && !entry.getName().equals("output"))
-                                addPackage1(entry.getName());
+                                addPackage1(entry.getName(), entry);
                             else if (entry.isFile() && !entry.getName().equals("output"))
                                 //   addClass(entry, CLASS);
                                 addClass(entry, checkForClassType(entry));
@@ -591,7 +592,7 @@ public class GridPaneNIO {
         pathText.setFont(Font.font("verdana", FontPosture.REGULAR, 15));
 
         textFlow.getChildren().addAll(projectText, pathText);
-        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(fd.getFile()), PROJECT));
+        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(fd.getFile()), PROJECT, path));
         treeView.setRoot(TreeItemProject);
     }
 
@@ -613,7 +614,7 @@ public class GridPaneNIO {
 
 
         textFlow.getChildren().addAll(projectText, pathText);
-        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(currentPath.getName()), PROJECT));
+        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(currentPath.getName()), PROJECT, path));
         treeView.setRoot(TreeItemProject);
 
     }
@@ -660,10 +661,10 @@ public class GridPaneNIO {
      * @param packageName name of the package
      * @throws IOException due to the creation of a directory
      */
-    public static void addPackage(String packageName) throws IOException {
+    public static void addPackage(String packageName, File file) throws IOException {
 
 
-        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(PACKAGE.getImage(), new Label(packageName), PACKAGE));
+        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(PACKAGE.getImage(), new Label(packageName), PACKAGE, file.getPath()));
         packageNameHashMap.put(packageName, treeItem);
         if (!Files.exists(Paths.get(path + File.separator + packageName)))
             Files.createDirectory(Paths.get(path + File.separator + packageName));
@@ -679,12 +680,12 @@ public class GridPaneNIO {
      * @param classKind   kind of the class enum, interface etc.
      * @throws FileNotFoundException gets thrown because createFile-method is getting called
      */
-    public static void addToPackage(String packageName, String className, ClassType classKind) throws FileNotFoundException {
+    public static void addToPackage(String packageName, String className, ClassType classKind, File file) throws FileNotFoundException {
 
         TreeItem<CustomItem> treeItem;
 
         if (classKind.equals(PACKAGE)) {
-            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), PACKAGE));
+            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), PACKAGE, file.getPath()));
             packageNameHashMap.put(className, treeItem);
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
 
@@ -814,7 +815,7 @@ public class GridPaneNIO {
      *
      * @param dir directory, where the project is located
      */
-    private static void findFilesRec(File dir) {
+     static void findFilesRec(File dir) {
         if (dir.isDirectory()) {
             if (!dir.getName().equals("output")) {
                 File[] entries = dir.listFiles();
@@ -943,5 +944,14 @@ public class GridPaneNIO {
     //needed for renaming purposes, represents type of class (package, class, enum or interface)
     public void setValueRename2(String valueRename2) {
         this.valueRename2 = valueRename2;
+    }
+
+
+    public ClassType getValueRename3() {
+        return valueRename3;
+    }
+
+    public void setValueRename3(ClassType valueRename3) {
+        this.valueRename3 = valueRename3;
     }
 }
