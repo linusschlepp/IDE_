@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
@@ -35,26 +36,30 @@ public class DeleteBox {
         button.setOnAction(e -> {
 
             try {
-                if(treeItem.getValue().getClassType().equals(ClassType.PACKAGE)){
+                if (treeItem.getValue().getClassType().equals(ClassType.PACKAGE)) {
                     Files.walk(Paths.get(treeItem.getValue().getPath())).sorted(Comparator.reverseOrder())
                             .map(Path::toFile)
                             .forEach(File::delete);
-                }
-                else {
-                    if (Files.deleteIfExists(Paths.get(treeItem.getValue().getPath())))
-                        Files.delete(Paths.get(treeItem.getValue().getPath()));
+                } else {
+                    String tempPath = treeItem.getValue().getPath();
+                    if (!tempPath.contains(".java"))
+                        tempPath += ".java";
+
+                    if (Files.deleteIfExists(Paths.get(tempPath))) {
+                        System.out.println("Sucessfully deleted");
+                        Files.delete(Paths.get(tempPath));
+                    }
                 }
 
 
             } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            finally {
+                if (ex instanceof NoSuchFileException)
+                    System.out.println();
+            } finally {
                 treeItem.getParent().getChildren().remove(treeItem);
             }
             window.close();
         });
-
 
 
     }

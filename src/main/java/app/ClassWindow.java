@@ -7,6 +7,8 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 import static app.ClassType.*;
@@ -41,15 +43,15 @@ public class ClassWindow {
             Button button = new Button("Ok");
             GridPane.setConstraints(label, 0, 0);
             GridPane.setConstraints(textField, 0, 1);
-            if(classKind.equals(CLASS)) {
+            if (classKind.equals(CLASS)) {
                 GridPane.setConstraints(checkBox, 0, 2);
                 grdPane.getChildren().add(checkBox);
             }
             //if no packages exist, the dropdown will not be displayed
             if (GridPaneNIO.packageNameHashMap.isEmpty()) {
                 GridPane.setConstraints(button, 0, 3);
-                grdPane.getChildren().addAll( label, textField, button);
-            //if packages exist, the dropdown will be filled with the contents of the packageNameHashMap
+                grdPane.getChildren().addAll(label, textField, button);
+                //if packages exist, the dropdown will be filled with the contents of the packageNameHashMap
             } else {
                 for (String s : GridPaneNIO.packageNameHashMap.keySet())
                     comboBox.getItems().add(s);
@@ -69,21 +71,44 @@ public class ClassWindow {
                 //Exception needs to be caught, because addToPackage, addPackage and addClass are throwing IOExceptions
                 try {
                     if (selectedValue != null)
-                        GridPaneNIO.addToPackage(selectedValue, textField.getText(), classKind, null);
+
+                        GridPaneNIO.addToPackage(selectedValue, textField.getText(), classKind,
+                                new File(GridPaneNIO.path + GridPaneNIO.getCorrectPath(Objects
+                                        .requireNonNull(getRequiredTreeItem(selectedValue)))+"\\"+selectedValue));
                     else if (!isPackage)
                         //if isPackage is false, we just add a Class to the filesystem as well as to the TreeView
                         GridPaneNIO.addClass(textField.getText(), classKind);
                     else
                         // if is Package is true, we add a Package to the filesystem as well as to the TreeView
-                        GridPaneNIO.addPackage(textField.getText(), new File(GridPaneNIO.path+"\\"+textField.getText()));
+                        GridPaneNIO.addPackage(textField.getText(), new File(GridPaneNIO.path + "\\" + textField.getText()));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
                 window.close();
             });
             //if the path is empty the AlertBox will be displayed
-        }else
+        } else
             AlertBox.display();
+
+    }
+
+
+    //TODO: check if this really works
+    /**
+     * Helper method which returns TreeItem, according to its corresponding name
+     *
+     * @param packageName name of the TreeItem/ package, which has been chosen in the ComboBox above
+     * @return corresponding TreeItem to the given name
+     */
+    private static TreeItem<CustomItem> getRequiredTreeItem(String packageName) {
+
+        for(String s : GridPaneNIO.packageNameHashMap.keySet()){
+            if (s.equals(packageName))
+                return GridPaneNIO.packageNameHashMap.get(s);
+        }
+
+
+        return null;
 
     }
 }

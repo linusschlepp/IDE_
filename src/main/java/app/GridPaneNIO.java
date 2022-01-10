@@ -216,7 +216,7 @@ public class GridPaneNIO {
                         tempTreeItem.get().getValue().getClassType().equals(PROJECT)) {
                     contextMenuPackages.show(tempTreeItem.get().getValue(), e.getScreenX(), e.getScreenY());
                     if (tempTreeItem.get().getValue().getClassType().equals(PACKAGE))
-                        ClassWindow.comboBox.setPromptText(tempTreeItem.get().getValue().getLabelText());
+                        ClassWindow.comboBox.setValue(tempTreeItem.get().getValue().getLabelText());
                 }
                 // if TreeItem corresponds to class
                 else
@@ -731,7 +731,7 @@ public class GridPaneNIO {
     /**
      * gets right path of packages
      */
-    private static String getCorrectPath(TreeItem<CustomItem> treeItem) {
+    public static String getCorrectPath(TreeItem<CustomItem> treeItem) {
         StringBuilder stringBuilder = new StringBuilder();
         List<String> stringList = new ArrayList<>();
         sb.setLength(0);
