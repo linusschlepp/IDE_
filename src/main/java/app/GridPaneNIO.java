@@ -39,8 +39,7 @@ public class GridPaneNIO {
     Stage primaryStage;
 
 
-    ClassType valueRename3;
-    String valueRename1;
+
     TreeItem<CustomItem>retTreeItem;
     static StringBuilder sb = new StringBuilder();
     static TextFlow textFlow = new TextFlow();
@@ -114,12 +113,11 @@ public class GridPaneNIO {
         menuItemClose1.setOnAction(e -> primaryStage.close());
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
-        menuItemRename.setOnAction(e -> RenameBox.display(getValueRename1(), getValueRename3()));
+        menuItemRename.setOnAction(e -> RenameBox.display(getRetTreeItem()));
 
         viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/terminate.png")));
         menuItemDelete.setGraphic(viewMenu);
-        menuItemDelete.setOnAction(e -> DeleteBox.display(getRetTreeItem().getValue().getLabelText(),
-                getRetTreeItem().getValue().getPath(), getRetTreeItem().getValue().getClassType()));
+        menuItemDelete.setOnAction(e -> DeleteBox.display(getRetTreeItem()));
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
         ImageView viewMenuItem = CLASS.getImage();
@@ -210,9 +208,9 @@ public class GridPaneNIO {
              //if TreeItem corresponds to project or package
 
                 //set name of class, which has to be renamed
-                setValueRename1(tempTreeItem.get().getValue().getLabelText());
+               // setValueRename1(tempTreeItem.get().getValue().getLabelText());
                 //set classType of class, which has to be renamed
-                setValueRename3(tempTreeItem.get().getValue().getClassType());
+               // setValueRename3(tempTreeItem.get().getValue().getClassType());
                 setRetTreeItem(tempTreeItem.get());
                 if (tempTreeItem.get().getValue().getClassType().equals(PACKAGE) ||
                         tempTreeItem.get().getValue().getClassType().equals(PROJECT)) {
@@ -940,25 +938,7 @@ public class GridPaneNIO {
     }
 
     //needed for renaming purposes, represents name of class, which is getting changed
-    public String getValueRename1() {
-        return valueRename1;
-    }
 
-    public void setValueRename1(String valueRename1) {
-        this.valueRename1 = valueRename1;
-    }
-
-
-
-    //needed for renaming purposes, represents ClassType, which is getting changed
-    public ClassType getValueRename3() {
-        return valueRename3;
-    }
-
-
-    public void setValueRename3(ClassType valueRename3) {
-        this.valueRename3 = valueRename3;
-    }
 
 
     public TreeItem<CustomItem> getRetTreeItem() {

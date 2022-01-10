@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TreeItem;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -17,13 +18,13 @@ import java.util.Comparator;
 public class DeleteBox {
 
 
-    public static void display(String className, String filePath, ClassType classType) {
+    public static void display(TreeItem<CustomItem> treeItem) {
 
         Stage window = new Stage();
-        window.setTitle("Delete " + className);
+        window.setTitle("Delete " + treeItem.getValue().getLabelText());
         GridPane grdPane = new GridPane();
         grdPane.setPadding(new Insets(8, 8, 8, 8));
-        Label label = new Label("Are you sure that you want to delete: " + className);
+        Label label = new Label("Are you sure that you want to delete: " + treeItem.getValue().getLabelText());
         Button button = new Button("Ok");
         GridPane.setConstraints(label, 0, 0);
         GridPane.setConstraints(button, 0, 5);
@@ -34,22 +35,27 @@ public class DeleteBox {
         button.setOnAction(e -> {
 
             try {
-                if(classType.equals(ClassType.PACKAGE)){
-                    Files.walk(Paths.get(filePath)).sorted(Comparator.reverseOrder())
+                if(treeItem.getValue().getClassType().equals(ClassType.PACKAGE)){
+                    Files.walk(Paths.get(treeItem.getValue().getPath())).sorted(Comparator.reverseOrder())
                             .map(Path::toFile)
                             .forEach(File::delete);
                 }
                 else {
-                    if (Files.deleteIfExists(Paths.get(filePath)))
-                        Files.delete(Paths.get(filePath));
+                    if (Files.deleteIfExists(Paths.get(treeItem.getValue().getPath())))
+                        Files.delete(Paths.get(treeItem.getValue().getPath()));
                 }
+
+
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-
+            finally {
+                treeItem.getParent().getChildren().remove(treeItem);
+            }
+            window.close();
         });
 
-        window.close();
+
 
     }
 }
