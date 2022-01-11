@@ -53,6 +53,7 @@ public class ClassWindow {
                 grdPane.getChildren().addAll(label, textField, button);
                 //if packages exist, the dropdown will be filled with the contents of the packageNameHashMap
             } else {
+
                 for (String s : GridPaneNIO.packageNameHashMap.keySet())
                     comboBox.getItems().add(s);
                 Label labelPackage = new Label("Add class to specific package:");
@@ -61,6 +62,7 @@ public class ClassWindow {
                 GridPane.setConstraints(button, 0, 5);
                 grdPane.getChildren().addAll(label, textField, labelPackage, comboBox, button);
             }
+            comboBox.getItems().add("");
             window.setScene(new Scene(grdPane, 200, 200));
             window.show();
 
@@ -70,7 +72,7 @@ public class ClassWindow {
                 String selectedValue = comboBox.getValue();
                 //Exception needs to be caught, because addToPackage, addPackage and addClass are throwing IOExceptions
                 try {
-                    if (selectedValue != null)
+                    if (selectedValue != null && !Objects.requireNonNull(selectedValue).isEmpty())
 
                         GridPaneNIO.addToPackage(selectedValue, textField.getText(), classKind,
                                 new File(GridPaneNIO.path + GridPaneNIO.getCorrectPath(Objects
@@ -84,6 +86,7 @@ public class ClassWindow {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
+                comboBox.getItems().clear();
                 window.close();
             });
             //if the path is empty the AlertBox will be displayed

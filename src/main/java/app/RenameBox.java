@@ -8,6 +8,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +16,6 @@ import java.nio.file.Paths;
 
 /**
  * This dialog-box gets shown if files/ directories have to be renamed
- *
  */
 public class RenameBox {
 
@@ -42,7 +42,7 @@ public class RenameBox {
         button.setOnAction(e -> {
 
             // if the required TreeItem is of classType package
-            if(treeItem.getValue().getClassType().equals(ClassType.PACKAGE)) {
+            if (treeItem.getValue().getClassType().equals(ClassType.PACKAGE)) {
                 //Searches in the HashMap and changes value (TreeItem) Label to the new input of the user
                 GridPaneNIO.packageNameHashMap.forEach((k, v) -> {
                     if (k.equals(treeItem.getValue().getLabelText())) {
@@ -57,25 +57,24 @@ public class RenameBox {
                 });
             }
             //if object to rename is class/ enum or interface
-            else{
+            else {
                 //TODO: This does not work, maybe implement HashTree in GridPaneNIO which contains all single files and then implement same logic as for directories
-                GridPaneNIO.TreeItemProject.getChildren().forEach(l ->{
-                            System.out.println(l.getValue().getLabelText());
-                   if( l.getValue().getLabelText().equals(treeItem.getValue().getLabelText())){
-                       Path source = Paths.get(l.getValue().getPath());
-                            try {
-                                Files.move(source, source.resolveSibling(textField.getText()));
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
+                GridPaneNIO.textAreaStringHashMap.forEach((k, v) -> {
+                            if (GridPaneNIO.textAreaStringHashMap.get(k).equals(treeItem.getValue().getLabelText())) {
+                                treeItem.getValue().setBoxText(textField.getText());
+                                Path source = Paths.get(treeItem.getValue().getPath());
+                                try {
+                                    Files.move(source, source.resolveSibling(textField.getText()));
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
+                                }
                             }
                         }
-                   }
-
-                        );
-                }
+                );
+            }
 
             window.close();
 
-    });
+        });
     }
 }
