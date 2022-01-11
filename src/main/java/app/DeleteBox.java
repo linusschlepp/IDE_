@@ -45,10 +45,9 @@ public class DeleteBox {
                     if (!tempPath.contains(".java"))
                         tempPath += ".java";
 
-                    if (Files.deleteIfExists(Paths.get(tempPath))) {
-                        System.out.println("Sucessfully deleted");
+                    if (Files.deleteIfExists(Paths.get(tempPath)))
                         Files.delete(Paths.get(tempPath));
-                    }
+
                 }
 
 

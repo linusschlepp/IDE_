@@ -58,7 +58,7 @@ public class RenameBox {
             }
             //if object to rename is class/ enum or interface
             else {
-                //TODO: This does not work, maybe implement HashTree in GridPaneNIO which contains all single files and then implement same logic as for directories
+
                 GridPaneNIO.textAreaStringHashMap.forEach((k, v) -> {
                             if (GridPaneNIO.textAreaStringHashMap.get(k).equals(treeItem.getValue().getLabelText())) {
                                 treeItem.getValue().setBoxText(textField.getText());

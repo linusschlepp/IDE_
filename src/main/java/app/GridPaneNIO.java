@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,8 +40,7 @@ public class GridPaneNIO {
     Stage primaryStage;
 
 
-
-    TreeItem<CustomItem>retTreeItem;
+    TreeItem<CustomItem> retTreeItem;
     static StringBuilder sb = new StringBuilder();
     static TextFlow textFlow = new TextFlow();
     static String path = "";
@@ -191,9 +191,9 @@ public class GridPaneNIO {
         AtomicReference<TreeItem<CustomItem>> tempTreeItem = new AtomicReference<>();
         treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             //to avoid the addition of too many menuItems within the contextMenu
-            if(contextMenuPackages.getItems().size() == 0 && contextMenuClasses.getItems().size() == 0) {
+            if (contextMenuPackages.getItems().size() == 0 && contextMenuClasses.getItems().size() == 0) {
                 //menuItems get added to contextMenuPackages
-                contextMenuPackages.getItems().addAll(copyMenuItem(menuItemAddClass), copyMenuItem(menuItemAddInterface),  copyMenuItem(menuItemAddEnum),
+                contextMenuPackages.getItems().addAll(copyMenuItem(menuItemAddClass), copyMenuItem(menuItemAddInterface), copyMenuItem(menuItemAddEnum),
                         copyMenuItem(menuItemAddPackage), copyMenuItem(menuItemRename), copyMenuItem(menuItemDelete));
                 //menuItems get added to contextMenuClasses
                 contextMenuClasses.getItems().addAll(copyMenuItem(menuItemRename), copyMenuItem(menuItemDelete));
@@ -205,12 +205,12 @@ public class GridPaneNIO {
             }
             //right-click on TreeItem
             tempTreeItem.get().getValue().getBoxText().setOnContextMenuRequested(e -> {
-             //if TreeItem corresponds to project or package
+                //if TreeItem corresponds to project or package
 
                 //set name of class, which has to be renamed
-               // setValueRename1(tempTreeItem.get().getValue().getLabelText());
+                // setValueRename1(tempTreeItem.get().getValue().getLabelText());
                 //set classType of class, which has to be renamed
-               // setValueRename3(tempTreeItem.get().getValue().getClassType());
+                // setValueRename3(tempTreeItem.get().getValue().getClassType());
                 setRetTreeItem(tempTreeItem.get());
                 if (tempTreeItem.get().getValue().getClassType().equals(PACKAGE) ||
                         tempTreeItem.get().getValue().getClassType().equals(PROJECT)) {
@@ -258,7 +258,7 @@ public class GridPaneNIO {
      * @param menuItem menuItem, which is getting copied
      * @return copy of menuItem
      */
-    private static MenuItem copyMenuItem(MenuItem menuItem){
+    private static MenuItem copyMenuItem(MenuItem menuItem) {
 
         MenuItem menuItemCopy = new MenuItem();
         menuItemCopy.setText(menuItem.getText());
@@ -823,7 +823,7 @@ public class GridPaneNIO {
      *
      * @param dir directory, where the project is located
      */
-     static void findFilesRec(File dir) {
+    static void findFilesRec(File dir) {
         if (dir.isDirectory()) {
             if (!dir.getName().equals("output")) {
                 File[] entries = dir.listFiles();
@@ -859,8 +859,13 @@ public class GridPaneNIO {
     private void generateOutputFolder() throws IOException {
 
         StringBuilder sb = new StringBuilder();
-        //if the output-folder doesn't exist yet, it is getting created
-        if (!Files.exists(Paths.get(path + File.separator + "output")))
+        //Output-Folder gets deleted before every execution of the program
+        if (Files.exists(Paths.get(path + File.separator + "output")))
+            Files.walk(Paths.get(path + File.separator + "output")).sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+            //if the output-folder doesn't exist yet, it is getting created
+        else
             Files.createDirectory(Paths.get(path + File.separator + "output"));
 
         //all files of listFiles are stored in the output folder
@@ -898,6 +903,7 @@ public class GridPaneNIO {
                     }
                 });
     }
+
 
     /**
      * Pairs of .java and .class files are getting found and created
@@ -937,10 +943,7 @@ public class GridPaneNIO {
 
     }
 
-    //needed for renaming purposes, represents name of class, which is getting changed
-
-
-
+    //needed for renaming and deleting purposes, treeItem which is getting changed
     public TreeItem<CustomItem> getRetTreeItem() {
         return retTreeItem;
     }
