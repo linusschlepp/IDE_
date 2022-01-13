@@ -284,7 +284,7 @@ public class GridPaneNIO {
      * @param fileContent content of the file/ class
      * @param pathOfFile  the location of the file
      */
-    private static void updateFile(String fileContent, String pathOfFile) {
+     static void updateFile(String fileContent, String pathOfFile) {
 
         Path newPath;
         if (pathOfFile.contains(".java"))
@@ -407,15 +407,13 @@ public class GridPaneNIO {
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
         } else {
             TextArea tArea = new TextArea(getClassContent(file));
-//            treeItem = new TreeItem(new CustomItem(classKind.getImage(), new Label(className),
-//                    tArea, path + File.separator + packageName +File.separator+ className));
+
 
             treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className),
                     tArea, filePath, classKind));
 
             textAreaStringHashMap.put(tArea, className);
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
-            // treeItem.getValue().setPath(getCorrectPath(treeItem));
         }
 
     }
@@ -656,7 +654,7 @@ public class GridPaneNIO {
 //            }
 //        });
         //TreeItem is getting created
-        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), tArea, path + File.separator + className, classKind));
+        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), tArea, path + File.separator + className+".java", classKind));
 
         TreeItemProject.getChildren().add(treeItem);
         textAreaStringHashMap.put(tArea, className);
@@ -767,9 +765,6 @@ public class GridPaneNIO {
     }
 
 
-//    private static boolean isValid(String text) {
-//        return text.contains("public");
-//    }
 
     /**
      * Creates the contents of the classes right after their creation

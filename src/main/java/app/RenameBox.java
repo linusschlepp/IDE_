@@ -58,15 +58,18 @@ public class RenameBox {
             }
             //if the required TreeItem is of classType enum, interface or class
             else {
-
+                //TODO: fixed renaming mechanism for files for now, still need to figure out why files are getting mulitplied have not really fixed it yet
                 GridPaneNIO.textAreaStringHashMap.forEach((k, v) -> {
                             if (GridPaneNIO.textAreaStringHashMap.get(k).equals(treeItem.getValue().getLabelText())) {
                                 String oldName = treeItem.getValue().getLabelText();
                                 treeItem.getValue().setBoxText(textField.getText());
                                 Path source = Paths.get(treeItem.getValue().getPath());
                                 changeClassContent(treeItem, textField.getText(), oldName);
+//                                treeItem.getValue().getTextArea().setText(treeItem.getValue().getTextArea().getText()
+//                                        .replaceAll(oldName, textField.getText()));
+
                                 try {
-                                    Files.move(source, source.resolveSibling(textField.getText()+".java"));
+                                    Files.move(source, source.resolveSibling(textField.getText() + ".java"));
 
                                 } catch (IOException ex) {
                                     ex.printStackTrace();
@@ -81,13 +84,12 @@ public class RenameBox {
         });
     }
 
-    private static void changeClassContent(TreeItem<CustomItem> treeItem, String newName, String oldName){
+    private static void changeClassContent(TreeItem<CustomItem> treeItem, String newName, String oldName) {
 
-        System.out.println(newName);
-        System.out.println(treeItem.getValue().getTextArea().getText());
+
         treeItem.getValue().getTextArea().setText(treeItem.getValue().getTextArea().getText()
-                .replaceAll(oldName,newName));
-        System.out.println(treeItem.getValue().getTextArea().getText());
+                .replaceAll(oldName, newName));
+        GridPaneNIO.updateFile(treeItem.getValue().getTextArea().getText(), treeItem.getValue().getPath());
 
 
 
