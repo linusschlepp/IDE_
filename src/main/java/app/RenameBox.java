@@ -56,15 +56,18 @@ public class RenameBox {
                     }
                 });
             }
-            //if object to rename is class/ enum or interface
+            //if the required TreeItem is of classType enum, interface or class
             else {
 
                 GridPaneNIO.textAreaStringHashMap.forEach((k, v) -> {
                             if (GridPaneNIO.textAreaStringHashMap.get(k).equals(treeItem.getValue().getLabelText())) {
+                                String oldName = treeItem.getValue().getLabelText();
                                 treeItem.getValue().setBoxText(textField.getText());
                                 Path source = Paths.get(treeItem.getValue().getPath());
+                                changeClassContent(treeItem, textField.getText(), oldName);
                                 try {
-                                    Files.move(source, source.resolveSibling(textField.getText()));
+                                    Files.move(source, source.resolveSibling(textField.getText()+".java"));
+
                                 } catch (IOException ex) {
                                     ex.printStackTrace();
                                 }
@@ -77,4 +80,17 @@ public class RenameBox {
 
         });
     }
+
+    private static void changeClassContent(TreeItem<CustomItem> treeItem, String newName, String oldName){
+
+        System.out.println(newName);
+        System.out.println(treeItem.getValue().getTextArea().getText());
+        treeItem.getValue().getTextArea().setText(treeItem.getValue().getTextArea().getText()
+                .replaceAll(oldName,newName));
+        System.out.println(treeItem.getValue().getTextArea().getText());
+
+
+
+    }
+
 }
