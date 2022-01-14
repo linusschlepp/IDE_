@@ -249,7 +249,7 @@ public class GridPaneNIO {
     }
 
     /**
-     * Helper-method which copies
+     * Helper-method which copies ImageViews for the label
      *
      * @param treeItem represents treeItem, which image is getting copied
      */
@@ -276,17 +276,8 @@ public class GridPaneNIO {
 
     }
 
-
-    private ImageView copyImageView(TreeItem<CustomItem> treeItem) {
-
-        ImageView imageView = treeItem.getValue().getImageView();
-
-        return imageView;
-    }
-
-
     /**
-     * Little helper-method, which copies MenuItems. This enables the addition of one MenuItem to multiple ContextMenus
+     * Helper-method, which copies MenuItems. This enables the addition of one MenuItem to multiple ContextMenus
      *
      * @param menuItem menuItem, which is getting copied
      * @return copy of menuItem
@@ -295,10 +286,40 @@ public class GridPaneNIO {
 
         MenuItem menuItemCopy = new MenuItem();
         menuItemCopy.setText(menuItem.getText());
-        menuItemCopy.setGraphic(menuItem.getGraphic());
+        menuItemCopy.setGraphic(copyImageMenuItem(menuItemCopy));
         menuItemCopy.setOnAction(menuItem.getOnAction());
 
         return menuItemCopy;
+    }
+
+
+    /**
+     * Helper-method, which returns the Image of the corresponding MenuItem
+     *
+     * @param menuItem the menuItem of which the image is required
+     * @return a copy of the ImageView from menuItem
+     */
+    private static ImageView copyImageMenuItem(MenuItem menuItem){
+
+        ImageView imageView = new ImageView();
+        try{
+            switch (menuItem.getText()) {
+                case "Delete" -> imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/terminate.png")));
+                case "Add Interface" -> imageView = INTERFACE.getImage();
+                case "Add Class" -> imageView = CLASS.getImage();
+                case "Add Enum" -> imageView = ENUM.getImage();
+                case "Add Package" -> imageView = PACKAGE.getImage();
+
+            }
+            imageView.setFitHeight(17);
+            imageView.setPreserveRatio(true);
+
+            return imageView;
+        }catch(FileNotFoundException e){
+            e.printStackTrace();
+        }
+
+            return new ImageView();
     }
 
     /**
@@ -383,6 +404,7 @@ public class GridPaneNIO {
      * @param className    name of the class/ file
      */
     private static void createFile(String classContent, String className) {
+        //TODO: three times File.seperator?, whats about this?
         try {
             if (!Files.exists(Paths.get(path + File.separator + File.separator + File.separator + className + ".java")))
                 Files.createFile(Paths.get(path + File.separator + File.separator + File.separator + className + ".java"));
@@ -492,11 +514,9 @@ public class GridPaneNIO {
                             if (entry.isDirectory() && !entry.getName().equals("output"))
                                 addPackage1(entry.getName(), entry);
                             else if (entry.isFile() && !entry.getName().equals("output"))
-                                //   addClass(entry, CLASS);
                                 addClass(entry, checkForClassType(entry));
                         } else {
                             if (entry.isDirectory() && !entry.getName().equals("output"))
-                                // addToPackage1(new File(entry.getParent()).getName(), entry.getName(), PACKAGE, entry);
                                 addToPackage(new File(entry.getParent()).getName(),
                                         entry.getPath(), entry.getName(), PACKAGE, entry);
                             else
@@ -511,10 +531,8 @@ public class GridPaneNIO {
             }
         } else {
             if (file.getPath().equals(path)) {
-                //   addClass(file, CLASS);
                 addClass(file, checkForClassType(file));
             } else {
-                // addToPackage1(new File(file.getParent()).getName(), file.getName().replaceAll(".java", ""), CLASS, file);
                 addToPackage(new File(file.getParent()).getName(), file.getPath(),
                         file.getName().replaceAll(".java", ""), CLASS, file);
             }
@@ -659,6 +677,8 @@ public class GridPaneNIO {
     }
 
     /**
+     * Checks class content for Main-class header. This method basically determines the main class
+     *
      * @param content Content of class/ file
      * @return True if file is main, False if it isn't
      */
