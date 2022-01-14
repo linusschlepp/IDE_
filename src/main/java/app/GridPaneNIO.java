@@ -39,7 +39,7 @@ public class GridPaneNIO {
 
     Stage primaryStage;
 
-
+    static Label label;
     TreeItem<CustomItem> retTreeItem;
     static StringBuilder sb = new StringBuilder();
     static TextFlow textFlow = new TextFlow();
@@ -149,7 +149,7 @@ public class GridPaneNIO {
         menuItemAddPackage.setGraphic(viewMenuItem);
         menuItemAddPackage.setOnAction(e -> ClassWindow.display(PACKAGE, true));
         viewMenu.setFitHeight(20);
-        Label label = new Label();
+        label = new Label();
         viewMenu.setPreserveRatio(true);
         menuItemAddProject.setOnAction(e -> {
             try {
@@ -207,10 +207,6 @@ public class GridPaneNIO {
             tempTreeItem.get().getValue().getBoxText().setOnContextMenuRequested(e -> {
                 //if TreeItem corresponds to project or package
 
-                //set name of class, which has to be renamed
-                // setValueRename1(tempTreeItem.get().getValue().getLabelText());
-                //set classType of class, which has to be renamed
-                // setValueRename3(tempTreeItem.get().getValue().getClassType());
                 setRetTreeItem(tempTreeItem.get());
                 if (tempTreeItem.get().getValue().getClassType().equals(PACKAGE) ||
                         tempTreeItem.get().getValue().getClassType().equals(PROJECT)) {
@@ -231,16 +227,17 @@ public class GridPaneNIO {
 
         /*
         everytime the text of textArea of a class is getting changed,
-         the text in the file is getting updated as well
+         the content in the file is getting updated as well
          */
         textArea.textProperty().addListener((observableValue, s, t1) -> {
             tempTreeItem.get().getValue().setText(t1);
             updateFile(tempTreeItem.get().getValue().getTextArea().getText(), tempTreeItem.get().getValue().getPath());
-            textAreaStringHashMap.forEach((k, v) -> {
-                if (v.equals(tempTreeItem.get().getValue().getLabelText()))
-                    k = tempTreeItem.get().getValue().getTextArea();
-            });
-            label.setGraphic(tempTreeItem.get().getValue().getImage());
+//            textAreaStringHashMap.forEach((k, v) -> {
+            //TODO: remove assignment: k = if possible
+//                if (v.equals(tempTreeItem.get().getValue().getLabelText()))
+//                    k = tempTreeItem.get().getValue().getTextArea();
+//            });
+            setImageLabel(tempTreeItem.get());
             label.setText(tempTreeItem.get().getValue().getLabelText());
         });
 
@@ -249,6 +246,42 @@ public class GridPaneNIO {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+    }
+
+    /**
+     * Helper-method which copies
+     *
+     * @param treeItem represents treeItem, which image is getting copied
+     */
+    private static void setImageLabel(TreeItem<CustomItem> treeItem) {
+
+        ImageView imageView;
+        try {
+
+            if (treeItem.getValue().getClassType().equals(PACKAGE))
+                imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/packagepicture.png")));
+            else if (treeItem.getValue().getClassType().equals(CLASS))
+                imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/classpicture.png")));
+            else if (treeItem.getValue().getClassType().equals(INTERFACE))
+                imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/interfacepicture.png")));
+            else
+                imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/enumpicture.png")));
+            imageView.setFitHeight(15);
+            imageView.setPreserveRatio(true);
+            label.setGraphic(imageView);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    private ImageView copyImageView(TreeItem<CustomItem> treeItem) {
+
+        ImageView imageView = treeItem.getValue().getImageView();
+
+        return imageView;
     }
 
 
@@ -284,7 +317,7 @@ public class GridPaneNIO {
      * @param fileContent content of the file/ class
      * @param pathOfFile  the location of the file
      */
-     static void updateFile(String fileContent, String pathOfFile) {
+    static void updateFile(String fileContent, String pathOfFile) {
 
         Path newPath;
         if (pathOfFile.contains(".java"))
@@ -654,7 +687,7 @@ public class GridPaneNIO {
 //            }
 //        });
         //TreeItem is getting created
-        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), tArea, path + File.separator + className+".java", classKind));
+        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), tArea, path + File.separator + className + ".java", classKind));
 
         TreeItemProject.getChildren().add(treeItem);
         textAreaStringHashMap.put(tArea, className);
@@ -763,7 +796,6 @@ public class GridPaneNIO {
 
         return stringBuilder.toString();
     }
-
 
 
     /**

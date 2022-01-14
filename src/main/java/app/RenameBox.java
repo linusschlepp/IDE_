@@ -64,7 +64,7 @@ public class RenameBox {
                                 String oldName = treeItem.getValue().getLabelText();
                                 treeItem.getValue().setBoxText(textField.getText());
                                 Path source = Paths.get(treeItem.getValue().getPath());
-                                changeClassContent(treeItem, textField.getText(), oldName);
+                              //  changeClassContent(treeItem, textField.getText(), oldName);
 //                                treeItem.getValue().getTextArea().setText(treeItem.getValue().getTextArea().getText()
 //                                        .replaceAll(oldName, textField.getText()));
 
