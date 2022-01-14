@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -58,13 +59,13 @@ public class RenameBox {
             }
             //if the required TreeItem is of classType enum, interface or class
             else {
-                //TODO: fixed renaming mechanism for files for now, still need to figure out why files are getting mulitplied have not really fixed it yet
+                //TODO: fixed renaming mechanism for files for now, still need to figure out why files are getting multiplied have not really fixed it yet
                 GridPaneNIO.textAreaStringHashMap.forEach((k, v) -> {
                             if (GridPaneNIO.textAreaStringHashMap.get(k).equals(treeItem.getValue().getLabelText())) {
                                 String oldName = treeItem.getValue().getLabelText();
                                 treeItem.getValue().setBoxText(textField.getText());
                                 Path source = Paths.get(treeItem.getValue().getPath());
-                              //  changeClassContent(treeItem, textField.getText(), oldName);
+                                changeClassContent(treeItem, textField.getText(), oldName);
 //                                treeItem.getValue().getTextArea().setText(treeItem.getValue().getTextArea().getText()
 //                                        .replaceAll(oldName, textField.getText()));
 
@@ -72,7 +73,8 @@ public class RenameBox {
                                     Files.move(source, source.resolveSibling(textField.getText() + ".java"));
 
                                 } catch (IOException ex) {
-                                    ex.printStackTrace();
+                                    if (!(ex instanceof NoSuchFileException))
+                                        ex.printStackTrace();
                                 }
                             }
                         }
@@ -90,7 +92,6 @@ public class RenameBox {
         treeItem.getValue().getTextArea().setText(treeItem.getValue().getTextArea().getText()
                 .replaceAll(oldName, newName));
         GridPaneNIO.updateFile(treeItem.getValue().getTextArea().getText(), treeItem.getValue().getPath());
-
 
 
     }

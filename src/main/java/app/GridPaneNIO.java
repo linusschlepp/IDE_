@@ -34,7 +34,10 @@ import java.util.stream.Collectors;
 
 import static app.ClassType.*;
 
-
+//TODO: Main objectives:
+//-fix multiplication error of files
+//-get the paths inside renamed packages right
+//-fix heads of files inside renamed packages (package package1)
 public class GridPaneNIO {
 
     Stage primaryStage;
@@ -113,27 +116,33 @@ public class GridPaneNIO {
         menuItemClose1.setOnAction(e -> primaryStage.close());
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
+        ImageView viewMenuItem = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/renameicon.png")));
+        menuItemRename.setGraphic(viewMenuItem);
+        viewMenuItem.setFitHeight(20);
+        viewMenuItem.setPreserveRatio(true);
+
         menuItemRename.setOnAction(e -> RenameBox.display(getRetTreeItem()));
+
 
         viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/terminate.png")));
         menuItemDelete.setGraphic(viewMenu);
         menuItemDelete.setOnAction(e -> DeleteBox.display(getRetTreeItem()));
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
-        ImageView viewMenuItem = CLASS.getImage();
+        viewMenuItem = CLASS.getImage();
         viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/plus.png")));
         viewMenuItem.setFitHeight(30);
         viewMenuItem.setPreserveRatio(true);
         menuAdd.setGraphic(viewMenu);
         menuItemAddClass.setAccelerator(KeyCombination.keyCombination("Ctrl+K"));
-        menuItemAddClass.setOnAction(e -> ClassWindow.display(CLASS, false));
+        menuItemAddClass.setOnAction(e -> ClassBox.display(CLASS, false));
         menuItemAddClass.setGraphic(viewMenuItem);
         viewMenuItem = INTERFACE.getImage();
         viewMenuItem.setFitHeight(30);
         viewMenuItem.setPreserveRatio(true);
         menuItemAddInterface.setAccelerator(KeyCombination.keyCombination("Ctrl+I"));
         menuItemAddInterface.setGraphic(viewMenuItem);
-        menuItemAddInterface.setOnAction(e -> ClassWindow.display(INTERFACE, false));
+        menuItemAddInterface.setOnAction(e -> ClassBox.display(INTERFACE, false));
         viewMenuItem = ENUM.getImage();
         viewMenuItem.setFitHeight(30);
         viewMenuItem.setPreserveRatio(true);
@@ -141,13 +150,13 @@ public class GridPaneNIO {
         contextMenuClasses = new ContextMenu();
         menuItemAddEnum.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
         menuItemAddEnum.setGraphic(viewMenuItem);
-        menuItemAddEnum.setOnAction(e -> ClassWindow.display(ENUM, false));
+        menuItemAddEnum.setOnAction(e -> ClassBox.display(ENUM, false));
         viewMenuItem = PACKAGE.getImage();
         viewMenuItem.setFitHeight(17);
         viewMenuItem.setPreserveRatio(true);
         menuItemAddPackage.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
         menuItemAddPackage.setGraphic(viewMenuItem);
-        menuItemAddPackage.setOnAction(e -> ClassWindow.display(PACKAGE, true));
+        menuItemAddPackage.setOnAction(e -> ClassBox.display(PACKAGE, true));
         viewMenu.setFitHeight(20);
         label = new Label();
         viewMenu.setPreserveRatio(true);
@@ -212,7 +221,7 @@ public class GridPaneNIO {
                         tempTreeItem.get().getValue().getClassType().equals(PROJECT)) {
                     contextMenuPackages.show(tempTreeItem.get().getValue(), e.getScreenX(), e.getScreenY());
                     if (tempTreeItem.get().getValue().getClassType().equals(PACKAGE))
-                        ClassWindow.comboBox.setValue(tempTreeItem.get().getValue().getLabelText());
+                        ClassBox.comboBox.setValue(tempTreeItem.get().getValue().getLabelText());
                 }
                 // if TreeItem corresponds to class
                 else
@@ -234,6 +243,7 @@ public class GridPaneNIO {
             updateFile(tempTreeItem.get().getValue().getTextArea().getText(), tempTreeItem.get().getValue().getPath());
 //            textAreaStringHashMap.forEach((k, v) -> {
             //TODO: remove assignment: k = if possible
+
 //                if (v.equals(tempTreeItem.get().getValue().getLabelText()))
 //                    k = tempTreeItem.get().getValue().getTextArea();
 //            });
@@ -309,6 +319,7 @@ public class GridPaneNIO {
                 case "Add Class" -> imageView = CLASS.getImage();
                 case "Add Enum" -> imageView = ENUM.getImage();
                 case "Add Package" -> imageView = PACKAGE.getImage();
+                case "Rename" -> imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/renameicon.png")));
 
             }
             imageView.setFitHeight(17);
@@ -340,11 +351,9 @@ public class GridPaneNIO {
      */
     static void updateFile(String fileContent, String pathOfFile) {
 
+        //TODO: If packages are renamed the paths of the files inside the packages need to be changed regarding to rename-efforts, otherwise a NoFileException is getting thrown
         Path newPath;
-        if (pathOfFile.contains(".java"))
-            newPath = Paths.get(pathOfFile);
-        else
-            newPath = Paths.get(pathOfFile + ".java");
+        newPath = pathOfFile.contains(".java") ? Paths.get(pathOfFile) : Paths.get(pathOfFile + ".java");
         try {
             Files.writeString(newPath, fileContent);
         } catch (Exception ex) {
@@ -371,8 +380,8 @@ public class GridPaneNIO {
             f = new JFileChooser();
             f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             f.showSaveDialog(null);
-            path = f.getCurrentDirectory() + File.separator + f.getSelectedFile().getName();
-            fileName = f.getSelectedFile().getName();
+            path = f.getSelectedFile() != null ? f.getCurrentDirectory() +"\\"+f.getSelectedFile().getName() : path;
+            fileName = f.getSelectedFile() != null ? f.getSelectedFile().getName() : fileName;
 
             Files.writeString((Paths.get(getRelativePath() + File.separator +
                     "projectfiles" + File.separator + "currentProject")), path);
@@ -382,7 +391,7 @@ public class GridPaneNIO {
         }
 
         textFlow = new TextFlow();
-        Text projectText = new Text("- " + f.getSelectedFile().getName() + " ");
+        Text projectText = new Text("- " + fileName + " ");
         projectText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
         projectText.setFill(Color.BLACK);
         Text pathText = new Text(path);
@@ -390,7 +399,7 @@ public class GridPaneNIO {
         pathText.setFont(Font.font("verdana", FontPosture.REGULAR, 15));
 
         textFlow.getChildren().addAll(projectText, pathText);
-        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(f.getSelectedFile().getName()), PROJECT, path));
+        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(fileName), PROJECT, path));
         treeView.setRoot(TreeItemProject);
         recreateRecProject(new File(path));
 
@@ -636,12 +645,12 @@ public class GridPaneNIO {
         FileDialog fd = new FileDialog(new Frame(), "Select the location for your project", FileDialog.SAVE);
         fd.setDirectory("C:\\");
         fd.setVisible(true);
-        fileName = fd.getFile();
-        path = fd.getDirectory() + fd.getFile();
+        fileName = fd.getFile()!=null ? fd.getFile() : fileName;
+        path = fd.getFile() != null && fd.getDirectory() != null ?  fd.getDirectory() + fd.getFile() : path;
         if (!Files.exists(Paths.get(path)))
             Files.createDirectory(Paths.get(path));
         createProjectFile();
-        Text projectText = new Text("- " + fd.getFile() + " ");
+        Text projectText = new Text("- " + fileName + " ");
         projectText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
         projectText.setFill(Color.BLACK);
         Text pathText = new Text(path);
@@ -649,7 +658,7 @@ public class GridPaneNIO {
         pathText.setFont(Font.font("verdana", FontPosture.REGULAR, 15));
 
         textFlow.getChildren().addAll(projectText, pathText);
-        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(fd.getFile()), PROJECT, path));
+        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(fileName), PROJECT, path));
         treeView.setRoot(TreeItemProject);
     }
 
@@ -811,10 +820,8 @@ public class GridPaneNIO {
 
         sb.append(";").append("\n\n");
 
-        if (stringBuilder.toString().contains(fileName))
-            return stringBuilder.toString().replaceAll(fileName, "");
 
-        return stringBuilder.toString();
+        return stringBuilder.toString().contains(fileName) ? stringBuilder.toString().replaceAll(fileName, "") : stringBuilder.toString();
     }
 
 
@@ -829,7 +836,7 @@ public class GridPaneNIO {
 
         sb.append("public ").append(className).append(" ").append(classContent).append("{").append("\n\n");
         //if it's the main-class, the main-method-head is getting added
-        if (ClassWindow.isSelected)
+        if (ClassBox.isSelected)
             sb.append("public static void main (String[] args) {").append("\n\n").append("}").append("\n\n");
         sb.append("}");
         String retString = sb.toString();

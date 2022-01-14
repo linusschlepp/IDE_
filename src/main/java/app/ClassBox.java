@@ -18,7 +18,7 @@ import static app.ClassType.*;
  * Gets displayed, if new classes/ packages are added to the TreeView
  * Enables user to select name location of the file (package-hierachy)
  */
-public class ClassWindow {
+public class ClassBox {
 
     static boolean isSelected = false;
     static ComboBox<String> comboBox = new ComboBox<>();
@@ -98,7 +98,7 @@ public class ClassWindow {
 
     //TODO: check if this really works
     /**
-     * Helper method which returns TreeItem, according to its corresponding name
+     * Helper-method which returns TreeItem, according to its corresponding name
      *
      * @param packageName name of the TreeItem/ package, which has been chosen in the ComboBox above
      * @return corresponding TreeItem to the given name
