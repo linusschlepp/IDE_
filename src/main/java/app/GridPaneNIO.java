@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 import static app.ClassType.*;
 
 //TODO: Main objectives:
-//-fix multiplication error of files
 //-get the paths inside renamed packages right
 //-fix heads of files inside renamed packages (package package1)
 public class GridPaneNIO {
@@ -66,7 +65,7 @@ public class GridPaneNIO {
     static GridPane gridPane = new GridPane();
     static TreeItem<CustomItem> TreeItemProject;
     static String fileName = "";
-    static TextArea textArea = new TextArea("Hello!");
+    static TextArea textArea = new TextArea();
     static List<File> listFiles = new ArrayList<>();
     ContextMenu contextMenuPackages;
     ContextMenu contextMenuClasses;

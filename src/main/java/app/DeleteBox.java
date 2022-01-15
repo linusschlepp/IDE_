@@ -52,8 +52,8 @@ public class DeleteBox {
 
 
             } catch (IOException ex) {
-                if (ex instanceof NoSuchFileException)
-                    System.out.println();
+                if (!(ex instanceof NoSuchFileException))
+                    ex.printStackTrace();
             } finally {
                 treeItem.getParent().getChildren().remove(treeItem);
             }

@@ -39,6 +39,7 @@ public class RenameBox {
         window.setScene(new Scene(grdPane, 300, 300));
         window.show();
 
+        //TODO: is iteration even necessary?
         //button initiates renaming process
         button.setOnAction(e -> {
 
@@ -59,16 +60,15 @@ public class RenameBox {
             }
             //if the required TreeItem is of classType enum, interface or class
             else {
-                //TODO: fixed renaming mechanism for files for now, still need to figure out why files are getting multiplied have not really fixed it yet
                 GridPaneNIO.textAreaStringHashMap.forEach((k, v) -> {
                             if (GridPaneNIO.textAreaStringHashMap.get(k).equals(treeItem.getValue().getLabelText())) {
                                 String oldName = treeItem.getValue().getLabelText();
                                 treeItem.getValue().setBoxText(textField.getText());
                                 Path source = Paths.get(treeItem.getValue().getPath());
+                                //path of treeItem is getting changed to new name
+                                treeItem.getValue().setPath(treeItem.getValue().getPath()
+                                        .replaceAll(oldName, textField.getText()));
                                 changeClassContent(treeItem, textField.getText(), oldName);
-//                                treeItem.getValue().getTextArea().setText(treeItem.getValue().getTextArea().getText()
-//                                        .replaceAll(oldName, textField.getText()));
-
                                 try {
                                     Files.move(source, source.resolveSibling(textField.getText() + ".java"));
 
