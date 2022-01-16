@@ -732,9 +732,9 @@ public class GridPaneNIO {
         TreeItemProject.getChildren().add(treeItem);
 
     }
-
+    //TODO: Check for files within mulitple packages, if file path is correct
     /**
-     * Classes/ files are getting added to the directories  in the fileSystem
+     * Classes/ files are getting added to the directories in the fileSystem
      *
      * @param packageName name of the individual-package
      * @param className   name of the class/ file, which is getting stored in the package
@@ -755,7 +755,7 @@ public class GridPaneNIO {
         } else {
             TextArea tArea = generateTextAreaContent(packageName, className, classKind);
             treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className),
-                    tArea, path + File.separator + packageName + File.separator + className, classKind));
+                    tArea, path + File.separator + packageName + File.separator + className+".java", classKind));
             textAreaStringHashMap.put(tArea, className);
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
             treeItem.getValue().setPath(path + getCorrectPath(treeItem) + className);

@@ -15,6 +15,8 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+
+//TODO: Check renaming for files within multiple packages
 /**
  * This dialog-box gets shown if files/ directories have to be renamed
  */
@@ -39,8 +41,6 @@ public class RenameBox {
         window.setScene(new Scene(grdPane, 300, 300));
         window.show();
 
-
-        //TODO: changeClassContent causes Multiplicationerror look at it
         //button initiates renaming process
         button.setOnAction(e -> {
 
@@ -69,7 +69,7 @@ public class RenameBox {
 
                 String oldName = treeItem.getValue().getLabelText();
                 treeItem.getValue().setBoxText(textField.getText());
-                Path source = Paths.get(treeItem.getValue().getPath());
+                Path source = Paths.get(treeItem.getValue().getPath().contains(".java") ? treeItem.getValue().getPath() : treeItem.getValue().getPath() + ".java");
                 //path of treeItem is getting changed to new name
                 treeItem.getValue().setPath(treeItem.getValue().getPath()
                         .replaceAll(oldName, textField.getText()));
@@ -77,12 +77,11 @@ public class RenameBox {
                 try {
 
                     System.out.println(source);
-                    System.out.println(source.resolveSibling(textField.getText() + ".java"));
-                    Files.move(source, source.resolveSibling(textField.getText() + ".java"));
+                    System.out.println(source.resolveSibling(textField.getText()));
+                    Files.move(source, source.resolveSibling(textField.getText()+".java"));
                     changeClassContent(treeItem, textField.getText(), oldName);
 
                 } catch (IOException ex) {
-                    if (!(ex instanceof NoSuchFileException))
                         ex.printStackTrace();
                 }
             }
