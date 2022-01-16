@@ -240,12 +240,6 @@ public class GridPaneNIO {
         textArea.textProperty().addListener((observableValue, s, t1) -> {
             tempTreeItem.get().getValue().setText(t1);
             updateFile(tempTreeItem.get().getValue().getTextArea().getText(), tempTreeItem.get().getValue().getPath());
-//            textAreaStringHashMap.forEach((k, v) -> {
-            //TODO: remove assignment: k = if possible
-
-//                if (v.equals(tempTreeItem.get().getValue().getLabelText()))
-//                    k = tempTreeItem.get().getValue().getTextArea();
-//            });
             setImageLabel(tempTreeItem.get());
             label.setText(tempTreeItem.get().getValue().getLabelText());
         });
@@ -350,7 +344,7 @@ public class GridPaneNIO {
      */
     static void updateFile(String fileContent, String pathOfFile) {
 
-        //TODO: If packages are renamed the paths of the files inside the packages need to be changed regarding to rename-efforts, otherwise a NoFileException is getting thrown
+
         Path newPath;
         newPath = pathOfFile.contains(".java") ? Paths.get(pathOfFile) : Paths.get(pathOfFile + ".java");
         try {
@@ -529,7 +523,7 @@ public class GridPaneNIO {
                                         entry.getPath(), entry.getName(), PACKAGE, entry);
                             else
                                 addToPackage(new File(entry.getParent()).getName(), entry.getPath(),
-                                        entry.getName().replaceAll(".java", ""), CLASS, entry);
+                                        entry.getName().replaceAll(".java", ""), checkForClassType(entry), entry);
                         }
 
                         if (entry.isDirectory())
@@ -542,7 +536,7 @@ public class GridPaneNIO {
                 addClass(file, checkForClassType(file));
             } else {
                 addToPackage(new File(file.getParent()).getName(), file.getPath(),
-                        file.getName().replaceAll(".java", ""), CLASS, file);
+                        file.getName().replaceAll(".java", ""), checkForClassType(file), file);
             }
 
         }

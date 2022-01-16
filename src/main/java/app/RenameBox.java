@@ -39,46 +39,52 @@ public class RenameBox {
         window.setScene(new Scene(grdPane, 300, 300));
         window.show();
 
-        //TODO: is iteration even necessary?
+
+        //TODO: changeClassContent causes Multiplicationerror look at it
         //button initiates renaming process
         button.setOnAction(e -> {
 
             // if the required TreeItem is of classType package
             if (treeItem.getValue().getClassType().equals(ClassType.PACKAGE)) {
-                //Searches in the HashMap and changes value (TreeItem) Label to the new input of the user
-                GridPaneNIO.packageNameHashMap.forEach((k, v) -> {
-                    if (k.equals(treeItem.getValue().getLabelText())) {
-                        GridPaneNIO.packageNameHashMap.get(k).getValue().setBoxText(textField.getText());
-                        Path source = Paths.get(GridPaneNIO.packageNameHashMap.get(k).getValue().getPath());
-                        try {
-                            Files.move(source, source.resolveSibling(textField.getText()));
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                });
+
+                String oldName = treeItem.getValue().getLabelText();
+                treeItem.getValue().setBoxText(textField.getText());
+
+                Path source = Paths.get(treeItem.getValue().getPath());
+                try {
+                    Files.move(source, source.resolveSibling(textField.getText()));
+                    treeItem.getChildren().forEach(t -> {
+                        //Path of files within renamend packages get changed to fit new path of renamed package
+                        t.getValue().setPath(t.getValue().getPath().replaceAll(oldName, textField.getText()));
+                        //the class content of the individual files gets changed as well to fit
+                        changeClassContent(t, oldName, textField.getText());
+                        System.out.println(t.getValue().getPath());
+                    });
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
             //if the required TreeItem is of classType enum, interface or class
             else {
-                GridPaneNIO.textAreaStringHashMap.forEach((k, v) -> {
-                            if (GridPaneNIO.textAreaStringHashMap.get(k).equals(treeItem.getValue().getLabelText())) {
-                                String oldName = treeItem.getValue().getLabelText();
-                                treeItem.getValue().setBoxText(textField.getText());
-                                Path source = Paths.get(treeItem.getValue().getPath());
-                                //path of treeItem is getting changed to new name
-                                treeItem.getValue().setPath(treeItem.getValue().getPath()
-                                        .replaceAll(oldName, textField.getText()));
-                                changeClassContent(treeItem, textField.getText(), oldName);
-                                try {
-                                    Files.move(source, source.resolveSibling(textField.getText() + ".java"));
 
-                                } catch (IOException ex) {
-                                    if (!(ex instanceof NoSuchFileException))
-                                        ex.printStackTrace();
-                                }
-                            }
-                        }
-                );
+                String oldName = treeItem.getValue().getLabelText();
+                treeItem.getValue().setBoxText(textField.getText());
+                Path source = Paths.get(treeItem.getValue().getPath());
+                //path of treeItem is getting changed to new name
+                treeItem.getValue().setPath(treeItem.getValue().getPath()
+                        .replaceAll(oldName, textField.getText()));
+
+                try {
+
+                    System.out.println(source);
+                    System.out.println(source.resolveSibling(textField.getText() + ".java"));
+                    Files.move(source, source.resolveSibling(textField.getText() + ".java"));
+                    changeClassContent(treeItem, textField.getText(), oldName);
+
+                } catch (IOException ex) {
+                    if (!(ex instanceof NoSuchFileException))
+                        ex.printStackTrace();
+                }
             }
 
             window.close();
@@ -86,6 +92,13 @@ public class RenameBox {
         });
     }
 
+    /**
+     * Changes classContent of files corresponding to renaming processes
+     *
+     * @param treeItem treeItem, of which the content is getting changed
+     * @param newName new name of the file
+     * @param oldName name which is getting replaced
+     */
     private static void changeClassContent(TreeItem<CustomItem> treeItem, String newName, String oldName) {
 
 
