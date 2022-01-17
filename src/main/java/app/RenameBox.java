@@ -10,13 +10,11 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 
 
 //TODO: Check renaming for files within multiple packages
+
 /**
  * This dialog-box gets shown if files/ directories have to be renamed
  */
@@ -48,27 +46,29 @@ public class RenameBox {
             if (treeItem.getValue().getClassType().equals(ClassType.PACKAGE)) {
 
                 String oldName = treeItem.getValue().getLabelText();
-                treeItem.getValue().setBoxText(textField.getText());
 
                 Path source = Paths.get(treeItem.getValue().getPath());
                 try {
+                    treeItem.getValue().setBoxText(textField.getText());
                     Files.move(source, source.resolveSibling(textField.getText()));
+                    //TODO: the classcontent of files within packages within packages doesn't get changed this still requires fixing
                     treeItem.getChildren().forEach(t -> {
                         //Path of files within renamend packages get changed to fit new path of renamed package
                         t.getValue().setPath(t.getValue().getPath().replaceAll(oldName, textField.getText()));
                         //the class content of the individual files gets changed as well to fit
-                        changeClassContent(t, oldName, textField.getText());
+                        if (!(t.getValue().getClassType().equals(ClassType.PACKAGE)))
+                            changeClassContent(t, textField.getText(), oldName);
                         System.out.println(t.getValue().getPath());
                     });
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    if (ex instanceof FileAlreadyExistsException)
+                        AlertBoxName.display(textField.getText());
                 }
             }
             //if the required TreeItem is of classType enum, interface or class
             else {
 
                 String oldName = treeItem.getValue().getLabelText();
-                treeItem.getValue().setBoxText(textField.getText());
                 Path source = Paths.get(treeItem.getValue().getPath().contains(".java") ? treeItem.getValue().getPath() : treeItem.getValue().getPath() + ".java");
                 //path of treeItem is getting changed to new name
                 treeItem.getValue().setPath(treeItem.getValue().getPath()
@@ -78,11 +78,13 @@ public class RenameBox {
 
                     System.out.println(source);
                     System.out.println(source.resolveSibling(textField.getText()));
-                    Files.move(source, source.resolveSibling(textField.getText()+".java"));
+                    treeItem.getValue().setBoxText(textField.getText());
+                    Files.move(source, source.resolveSibling(textField.getText() + ".java"));
                     changeClassContent(treeItem, textField.getText(), oldName);
 
                 } catch (IOException ex) {
-                        ex.printStackTrace();
+                    if (ex instanceof FileAlreadyExistsException)
+                        AlertBoxName.display(textField.getText());
                 }
             }
 
@@ -95,14 +97,18 @@ public class RenameBox {
      * Changes classContent of files corresponding to renaming processes
      *
      * @param treeItem treeItem, of which the content is getting changed
-     * @param newName new name of the file
-     * @param oldName name which is getting replaced
+     * @param newName  new name of the file
+     * @param oldName  name which is getting replaced
      */
     private static void changeClassContent(TreeItem<CustomItem> treeItem, String newName, String oldName) {
+        System.out.println(oldName);
+        System.out.println(newName);
 
-
+        System.out.println(treeItem.getValue().getTextArea().getText());
         treeItem.getValue().getTextArea().setText(treeItem.getValue().getTextArea().getText()
                 .replaceAll(oldName, newName));
+        System.out.println(treeItem.getValue().getTextArea().getText());
+
         GridPaneNIO.updateFile(treeItem.getValue().getTextArea().getText(), treeItem.getValue().getPath());
 
 
