@@ -50,7 +50,10 @@ public class RenameBox {
 
                 Path source = Paths.get(treeItem.getValue().getPath());
                 try {
+
                     treeItem.getValue().setBoxText(textField.getText());
+                    //GridPaneNIO.packageNameHashMap.computeIfPresent(oldName, (k,v) -> k=textField.getText())
+                    GridPaneNIO.packageNameHashMap.put(textField.getText(), GridPaneNIO.packageNameHashMap.remove(oldName));
                     Files.move(source, source.resolveSibling(textField.getText()));
                     //takes a recursive-approach changes the content of the children of the package and the children of the packages within in the packages
                     changeClassContentRec(treeItem.getChildren(), textField.getText(), oldName);

@@ -53,7 +53,7 @@ public class ClassBox {
                 grdPane.getChildren().addAll(label, textField, button);
                 //if packages exist, the dropdown will be filled with the contents of the packageNameHashMap
             } else {
-
+                //TODO: ComboBox is still buggy, try to fix this issue
                 for (String s : GridPaneNIO.packageNameHashMap.keySet())
                     comboBox.getItems().add(s);
                 Label labelPackage = new Label("Add class to specific package:");
@@ -86,7 +86,7 @@ public class ClassBox {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-                comboBox.getItems().clear();
+                comboBox.setValue(null);
                 window.close();
             });
             //if the path is empty the AlertBox will be displayed
