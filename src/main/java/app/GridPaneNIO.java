@@ -36,7 +36,6 @@ import static app.ClassType.*;
 
 //TODO: Main objectives:
 //-get the paths inside renamed packages right
-//-fix heads of files inside renamed packages (package package1)
 public class GridPaneNIO {
 
     Stage primaryStage;

@@ -1,5 +1,6 @@
 package app;
 
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -51,15 +52,9 @@ public class RenameBox {
                 try {
                     treeItem.getValue().setBoxText(textField.getText());
                     Files.move(source, source.resolveSibling(textField.getText()));
-                    //TODO: the classcontent of files within packages within packages doesn't get changed this still requires fixing
-                    treeItem.getChildren().forEach(t -> {
-                        //Path of files within renamend packages get changed to fit new path of renamed package
-                        t.getValue().setPath(t.getValue().getPath().replaceAll(oldName, textField.getText()));
-                        //the class content of the individual files gets changed as well to fit
-                        if (!(t.getValue().getClassType().equals(ClassType.PACKAGE)))
-                            changeClassContent(t, textField.getText(), oldName);
-                        System.out.println(t.getValue().getPath());
-                    });
+                    //takes a recursive-approach changes the content of the children of the package and the children of the packages within in the packages
+                    changeClassContentRec(treeItem.getChildren(), textField.getText(), oldName);
+
                 } catch (IOException ex) {
                     if (ex instanceof FileAlreadyExistsException)
                         AlertBoxName.display(textField.getText());
@@ -110,6 +105,29 @@ public class RenameBox {
         System.out.println(treeItem.getValue().getTextArea().getText());
 
         GridPaneNIO.updateFile(treeItem.getValue().getTextArea().getText(), treeItem.getValue().getPath());
+
+
+    }
+
+    /**
+     * Recursive method, which changes the content of files withing packages and of the files within packages within packages and so on...
+     *
+     * @param list children of treeItem (package)
+     * @param newName new Name of parent-treeItem
+     * @param oldName old Name of parent-treeItem
+     */
+    private static void changeClassContentRec(ObservableList<TreeItem<CustomItem>> list, String newName, String oldName) {
+
+        if (list.size() == 0)
+            return;
+
+        list.forEach(t -> {
+            t.getValue().setPath(t.getValue().getPath().replaceAll(oldName, newName));
+            if (!t.getValue().getClassType().equals(ClassType.PACKAGE))
+                changeClassContent(t, newName, oldName);
+            else
+                changeClassContentRec(t.getChildren(), newName, oldName);
+        });
 
 
     }
