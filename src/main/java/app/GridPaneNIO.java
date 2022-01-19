@@ -219,7 +219,7 @@ public class GridPaneNIO {
                         tempTreeItem.get().getValue().getClassType().equals(PROJECT)) {
                     contextMenuPackages.show(tempTreeItem.get().getValue(), e.getScreenX(), e.getScreenY());
                     if (tempTreeItem.get().getValue().getClassType().equals(PACKAGE))
-                        ClassBox.comboBox.setValue(tempTreeItem.get().getValue().getLabelText());
+                        ClassBox.defaultValue = tempTreeItem.get().getValue().getLabelText();
                 }
                 // if TreeItem corresponds to class
                 else
@@ -301,10 +301,10 @@ public class GridPaneNIO {
      * @param menuItem the menuItem of which the image is required
      * @return a copy of the ImageView from menuItem
      */
-    private static ImageView copyImageMenuItem(MenuItem menuItem){
+    private static ImageView copyImageMenuItem(MenuItem menuItem) {
 
         ImageView imageView = new ImageView();
-        try{
+        try {
             switch (menuItem.getText()) {
                 case "Delete" -> imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/terminate.png")));
                 case "Add Interface" -> imageView = INTERFACE.getImage();
@@ -318,11 +318,11 @@ public class GridPaneNIO {
             imageView.setPreserveRatio(true);
 
             return imageView;
-        }catch(FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-            return new ImageView();
+        return new ImageView();
     }
 
     /**
@@ -372,7 +372,7 @@ public class GridPaneNIO {
             f = new JFileChooser();
             f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             f.showSaveDialog(null);
-            path = f.getSelectedFile() != null ? f.getCurrentDirectory() +"\\"+f.getSelectedFile().getName() : path;
+            path = f.getSelectedFile() != null ? f.getCurrentDirectory() + "\\" + f.getSelectedFile().getName() : path;
             fileName = f.getSelectedFile() != null ? f.getSelectedFile().getName() : fileName;
 
             Files.writeString((Paths.get(getRelativePath() + File.separator +
@@ -637,8 +637,8 @@ public class GridPaneNIO {
         FileDialog fd = new FileDialog(new Frame(), "Select the location for your project", FileDialog.SAVE);
         fd.setDirectory("C:\\");
         fd.setVisible(true);
-        fileName = fd.getFile()!=null ? fd.getFile() : fileName;
-        path = fd.getFile() != null && fd.getDirectory() != null ?  fd.getDirectory() + fd.getFile() : path;
+        fileName = fd.getFile() != null ? fd.getFile() : fileName;
+        path = fd.getFile() != null && fd.getDirectory() != null ? fd.getDirectory() + fd.getFile() : path;
         if (!Files.exists(Paths.get(path)))
             Files.createDirectory(Paths.get(path));
         createProjectFile();
@@ -723,7 +723,6 @@ public class GridPaneNIO {
      */
     public static void addPackage(String packageName, File file) throws IOException {
 
-        System.out.println(path);
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(PACKAGE.getImage(), new Label(packageName), PACKAGE, file.getPath()));
         packageNameHashMap.put(packageName, treeItem);
         if (!Files.exists(Paths.get(path + File.separator + packageName)))
@@ -732,6 +731,7 @@ public class GridPaneNIO {
 
     }
     //TODO: Check for files within mulitple packages, if file path is correct
+
     /**
      * Classes/ files are getting added to the directories in the fileSystem
      *
@@ -754,7 +754,7 @@ public class GridPaneNIO {
         } else {
             TextArea tArea = generateTextAreaContent(packageName, className, classKind);
             treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className),
-                    tArea, path + File.separator + packageName + File.separator + className+".java", classKind));
+                    tArea, path + File.separator + packageName + File.separator + className + ".java", classKind));
             textAreaStringHashMap.put(tArea, className);
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
             treeItem.getValue().setPath(path + getCorrectPath(treeItem) + className);

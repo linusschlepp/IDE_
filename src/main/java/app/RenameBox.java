@@ -14,11 +14,7 @@ import java.io.IOException;
 import java.nio.file.*;
 
 
-//TODO: Check renaming for files within multiple packages
 
-/**
- * This dialog-box gets shown if files/ directories have to be renamed
- */
 public class RenameBox {
 
     public static void display(TreeItem<CustomItem> treeItem) {
@@ -73,9 +69,6 @@ public class RenameBox {
                         .replaceAll(oldName, textField.getText()));
 
                 try {
-
-                    System.out.println(source);
-                    System.out.println(source.resolveSibling(textField.getText()));
                     treeItem.getValue().setBoxText(textField.getText());
                     Files.move(source, source.resolveSibling(textField.getText() + ".java"));
                     changeClassContent(treeItem, textField.getText(), oldName);
@@ -99,17 +92,10 @@ public class RenameBox {
      * @param oldName  name which is getting replaced
      */
     private static void changeClassContent(TreeItem<CustomItem> treeItem, String newName, String oldName) {
-        System.out.println(oldName);
-        System.out.println(newName);
-
-        System.out.println(treeItem.getValue().getTextArea().getText());
         treeItem.getValue().getTextArea().setText(treeItem.getValue().getTextArea().getText()
                 .replaceAll(oldName, newName));
-        System.out.println(treeItem.getValue().getTextArea().getText());
 
         GridPaneNIO.updateFile(treeItem.getValue().getTextArea().getText(), treeItem.getValue().getPath());
-
-
     }
 
     /**

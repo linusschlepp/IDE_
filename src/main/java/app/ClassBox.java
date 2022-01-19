@@ -20,6 +20,7 @@ import static app.ClassType.*;
  */
 public class ClassBox {
 
+    static String defaultValue;
     static boolean isSelected = false;
     static ComboBox<String> comboBox = new ComboBox<>();
 
@@ -53,7 +54,9 @@ public class ClassBox {
                 grdPane.getChildren().addAll(label, textField, button);
                 //if packages exist, the dropdown will be filled with the contents of the packageNameHashMap
             } else {
-                //TODO: ComboBox is still buggy, try to fix this issue
+                //comboBox gets initialized everytime when ClassBox is called
+                comboBox = new ComboBox<>();
+                comboBox.setValue(defaultValue);
                 for (String s : GridPaneNIO.packageNameHashMap.keySet())
                     comboBox.getItems().add(s);
                 Label labelPackage = new Label("Add class to specific package:");
@@ -86,8 +89,9 @@ public class ClassBox {
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
-                comboBox.setValue(null);
+
                 window.close();
+                defaultValue = "";
             });
             //if the path is empty the AlertBox will be displayed
         } else
