@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.*;
 
 
-
 public class RenameBox {
 
     public static void display(TreeItem<CustomItem> treeItem) {
@@ -39,13 +38,12 @@ public class RenameBox {
         //button initiates renaming process
         button.setOnAction(e -> {
 
-            // if the required TreeItem is of classType package
-            if (treeItem.getValue().getClassType().equals(ClassType.PACKAGE)) {
+            try {
+                // if the required TreeItem is of classType package
+                if (treeItem.getValue().getClassType().equals(ClassType.PACKAGE)) {
 
-                String oldName = treeItem.getValue().getLabelText();
-
-                Path source = Paths.get(treeItem.getValue().getPath());
-                try {
+                    String oldName = treeItem.getValue().getLabelText();
+                    Path source = Paths.get(treeItem.getValue().getPath());
 
                     treeItem.getValue().setBoxText(textField.getText());
                     //GridPaneNIO.packageNameHashMap.computeIfPresent(oldName, (k,v) -> k=textField.getText())
@@ -54,33 +52,24 @@ public class RenameBox {
                     //takes a recursive-approach changes the content of the children of the package and the children of the packages within in the packages
                     changeClassContentRec(treeItem.getChildren(), textField.getText(), oldName);
 
-                } catch (IOException ex) {
-                    if (ex instanceof FileAlreadyExistsException)
-                        AlertBoxName.display(textField.getText());
                 }
-            }
-            //if the required TreeItem is of classType enum, interface or class
-            else {
-
-                String oldName = treeItem.getValue().getLabelText();
-                Path source = Paths.get(treeItem.getValue().getPath().contains(".java") ? treeItem.getValue().getPath() : treeItem.getValue().getPath() + ".java");
-                //path of treeItem is getting changed to new name
-                treeItem.getValue().setPath(treeItem.getValue().getPath()
-                        .replaceAll(oldName, textField.getText()));
-
-                try {
+                //if the required TreeItem is of classType enum, interface or class
+                else {
+                    String oldName = treeItem.getValue().getLabelText();
+                    Path source = Paths.get(treeItem.getValue().getPath().contains(".java") ? treeItem.getValue().getPath() : treeItem.getValue().getPath() + ".java");
+                    //path of treeItem is getting changed to new name
+                    treeItem.getValue().setPath(treeItem.getValue().getPath()
+                            .replaceAll(oldName, textField.getText()));
                     treeItem.getValue().setBoxText(textField.getText());
                     Files.move(source, source.resolveSibling(textField.getText() + ".java"));
                     changeClassContent(treeItem, textField.getText(), oldName);
-
-                } catch (IOException ex) {
-                    if (ex instanceof FileAlreadyExistsException)
-                        AlertBoxName.display(textField.getText());
                 }
+            } catch (IOException ex) {
+                if (ex instanceof FileAlreadyExistsException)
+                    AlertBoxName.display(textField.getText());
+            }finally {
+                window.close();
             }
-
-            window.close();
-
         });
     }
 
@@ -101,7 +90,7 @@ public class RenameBox {
     /**
      * Recursive method, which changes the content of files withing packages and of the files within packages within packages and so on...
      *
-     * @param list children of treeItem (package)
+     * @param list    children of treeItem (package)
      * @param newName new Name of parent-treeItem
      * @param oldName old Name of parent-treeItem
      */
