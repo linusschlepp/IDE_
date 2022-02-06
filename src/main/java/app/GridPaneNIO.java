@@ -332,7 +332,9 @@ public class GridPaneNIO {
      */
     public static String getRelativePath() {
 
-        return new File("").getAbsolutePath() + "//" + "src" + "//" + "main" + "//" + "java";
+        //  return new File("").getAbsolutePath() + "//" + "src" + "//" + "main" + "//" + "java";
+//TODO: Issue with relativePath needs to be resolved for creating .jar file
+        return "C:\\Intellij-Projekte\\IDE_\\src\\main\\java";
     }
 
     /**
