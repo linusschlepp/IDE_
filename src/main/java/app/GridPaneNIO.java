@@ -15,6 +15,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.scene.text.Font;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -34,11 +36,11 @@ import java.util.stream.Collectors;
 
 import static app.ClassType.*;
 
-//TODO: Main objectives:
-//-get the paths inside renamed packages right
+//TODO: Main objectives: prepare program for .jar
+
 public class GridPaneNIO {
 
-    Stage primaryStage;
+    static Stage primaryStage;
 
     static Label label;
     TreeItem<CustomItem> retTreeItem;
@@ -229,9 +231,6 @@ public class GridPaneNIO {
         });
 
 
-
-
-
         /*
         everytime the text of textArea of a class is getting changed,
          the content in the file is getting updated as well
@@ -364,18 +363,14 @@ public class GridPaneNIO {
      */
     private static void selectProject() throws FileNotFoundException {
 
-        JFileChooser f;
+        DirectoryChooser directoryChooser = new DirectoryChooser();
 
         try {
             textAreaStringHashMap = new HashMap<>();
             packageNameHashMap = new HashMap<>();
             listFiles.clear();
-
-            f = new JFileChooser();
-            f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            f.showSaveDialog(null);
-            path = f.getSelectedFile() != null ? f.getCurrentDirectory() + "\\" + f.getSelectedFile().getName() : path;
-            fileName = f.getSelectedFile() != null ? f.getSelectedFile().getName() : fileName;
+            path = directoryChooser.showDialog(primaryStage) != null ? directoryChooser.showDialog(primaryStage).getPath() : path;
+            fileName = directoryChooser.showDialog(primaryStage) != null ? directoryChooser.showDialog(primaryStage).getName() : fileName;
 
             Files.writeString((Paths.get(getRelativePath() + File.separator +
                     "projectfiles" + File.separator + "currentProject")), path);
@@ -396,7 +391,6 @@ public class GridPaneNIO {
         TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(fileName), PROJECT, path));
         treeView.setRoot(TreeItemProject);
         recreateRecProject(new File(path));
-
 
     }
 
