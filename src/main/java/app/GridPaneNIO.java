@@ -23,13 +23,12 @@ import javafx.stage.Stage;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -41,7 +40,6 @@ import static app.ClassType.*;
 public class GridPaneNIO {
 
     static Stage primaryStage;
-
     static Label label;
     TreeItem<CustomItem> retTreeItem;
     static StringBuilder sb = new StringBuilder();
@@ -80,11 +78,13 @@ public class GridPaneNIO {
     GridPaneNIO(Stage primaryStage) {
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
-        this.primaryStage = primaryStage;
-        this.primaryStage.setX(bounds.getMinX());
-        this.primaryStage.setX(bounds.getMinY());
-        this.primaryStage.setWidth(bounds.getWidth());
-        this.primaryStage.setHeight(bounds.getHeight());
+        GridPaneNIO.primaryStage = primaryStage;
+        // Icon is added to primaryStage
+        GridPaneNIO.primaryStage.getIcons().add(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("AppIcon.png"))));
+        GridPaneNIO.primaryStage.setX(bounds.getMinX());
+        GridPaneNIO.primaryStage.setX(bounds.getMinY());
+        GridPaneNIO.primaryStage.setWidth(bounds.getWidth());
+        GridPaneNIO.primaryStage.setHeight(bounds.getHeight());
         recreateProject();
     }
 
@@ -93,14 +93,14 @@ public class GridPaneNIO {
      *
      * @throws FileNotFoundException because new files are initialized
      */
-    public void start() throws FileNotFoundException {
+    public void start() throws FileNotFoundException, URISyntaxException {
 
-
+        System.out.println(new File("pictures/plus.png").toURI().toString());
         menuExecute.getItems().add(menuItemExec1);
         menuAdd.getItems().addAll(menuItemAddClass, menuItemAddInterface, menuItemAddEnum, menuItemAddPackage, menuItemAddProject, menuItemSelectProject);
         menuClose.getItems().add(menuItemClose1);
 
-        primaryStage.setTitle("Linus IDE");
+        primaryStage.setTitle("KiWi IDE");
 
 
         ImageView viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/greenplay.png")));

@@ -1,7 +1,10 @@
 package app;
 
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
+
+import java.io.File;
 
 /**
  * Instantiates one instance of GridPaneNIO and passes it to the primaryStage
