@@ -10,7 +10,7 @@ import java.io.File;
  * Instantiates one instance of GridPaneNIO and passes it to the primaryStage
  *
  * @author  Linus Schlepp
- * @version 0.0.8
+ * @version 1.0.0
  */
 public class Main extends Application {
 

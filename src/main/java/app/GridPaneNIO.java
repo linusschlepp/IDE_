@@ -95,12 +95,12 @@ public class GridPaneNIO {
      */
     public void start() throws FileNotFoundException, URISyntaxException {
 
-        System.out.println(new File("pictures/plus.png").toURI().toString());
+
         menuExecute.getItems().add(menuItemExec1);
         menuAdd.getItems().addAll(menuItemAddClass, menuItemAddInterface, menuItemAddEnum, menuItemAddPackage, menuItemAddProject, menuItemSelectProject);
         menuClose.getItems().add(menuItemClose1);
 
-        primaryStage.setTitle("KiWi IDE");
+        primaryStage.setTitle("K1vv1 IDE");
 
 
         ImageView viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/greenplay.png")));
@@ -330,10 +330,17 @@ public class GridPaneNIO {
      * @return relativePath of the IDE
      */
     public static String getRelativePath() {
-
-        //  return new File("").getAbsolutePath() + "//" + "src" + "//" + "main" + "//" + "java";
 //TODO: Issue with relativePath needs to be resolved for creating .jar file
+       //   return new File("").getAbsolutePath() + "//" + "src" + "//" + "main" + "//" + "java";
+        System.out.println(new File(Objects.requireNonNull(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResource("")).getPath())).getPath());
+        System.out.println("Hallo!");
         return "C:\\Intellij-Projekte\\IDE_\\src\\main\\java";
+       // return new File(Objects.requireNonNull(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResource("")).getPath())).getPath();
+
+
+//        return new File(new File(new File(new File(
+//                Objects.requireNonNull(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResource("")))
+//                        .getPath()).getParent()).getParent()).getPath()).getPath() + "\\src\\main\\java";
     }
 
     /**
@@ -369,8 +376,9 @@ public class GridPaneNIO {
             textAreaStringHashMap = new HashMap<>();
             packageNameHashMap = new HashMap<>();
             listFiles.clear();
-            path = directoryChooser.showDialog(primaryStage) != null ? directoryChooser.showDialog(primaryStage).getPath() : path;
-            fileName = directoryChooser.showDialog(primaryStage) != null ? directoryChooser.showDialog(primaryStage).getName() : fileName;
+            File tempFile = directoryChooser.showDialog(primaryStage);
+            path = tempFile != null ? tempFile.getPath() : path;
+            fileName = tempFile != null ? tempFile.getName() : fileName;
 
             Files.writeString((Paths.get(getRelativePath() + File.separator +
                     "projectfiles" + File.separator + "currentProject")), path);
@@ -401,11 +409,11 @@ public class GridPaneNIO {
      * @param className    name of the class/ file
      */
     private static void createFile(String classContent, String className) {
-        //TODO: three times File.seperator?, whats about this?
+
         try {
-            if (!Files.exists(Paths.get(path + File.separator + File.separator + File.separator + className + ".java")))
-                Files.createFile(Paths.get(path + File.separator + File.separator + File.separator + className + ".java"));
-            Files.writeString(Paths.get(path + File.separator + File.separator + File.separator + className + ".java"), classContent);
+            if (!Files.exists(Paths.get(path + File.separator + className + ".java")))
+                Files.createFile(Paths.get(path + File.separator + className + ".java"));
+            Files.writeString(Paths.get(path + File.separator + className + ".java"), classContent);
         } catch (IOException e) {
             e.printStackTrace();
         }
