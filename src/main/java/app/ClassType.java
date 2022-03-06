@@ -2,10 +2,7 @@ package app;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import static app.GridPaneNIO.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Returns the image and name of the individual instances of the TextArea and FileSystem in a type-safe manner
@@ -21,12 +18,8 @@ public enum ClassType {
         }
         @Override
         public ImageView getImage() {
-            try {
-                return  new ImageView(new Image(new FileInputStream(getRelativePath() +File.separator + "pictures/packagepicture.png")));
-            }
-            catch (IOException e){
-                return null;
-            }
+            // return  new ImageView(new Image(new FileInputStream(getRelativePath() +File.separator + "pictures/packagepicture.png")));
+            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/packageIcon.png"))));
         }
     },
     CLASS{
@@ -36,12 +29,8 @@ public enum ClassType {
         }
         @Override
         public ImageView getImage() {
-            try {
-                return new ImageView(new Image(new FileInputStream(getRelativePath() +  File.separator + "pictures/classpicture.png")));
-            }
-            catch (IOException e){
-                return null;
-            }
+            // return new ImageView(new Image(new FileInputStream(getRelativePath() +  File.separator + "pictures/classpicture.png")));
+            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/classIcon.png"))));
         }
     },
     ENUM{
@@ -52,12 +41,8 @@ public enum ClassType {
 
         @Override
         public ImageView getImage() {
-            try {
-                return  new ImageView(new Image(new FileInputStream(getRelativePath() +  File.separator + "pictures/enumpicture.png")));
-            }
-            catch (IOException e){
-                return null;
-            }
+            // return  new ImageView(new Image(new FileInputStream(getRelativePath() +  File.separator + "pictures/enumpicture.png")));
+            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/enumIcon.png"))));
         }
     },
     INTERFACE{
@@ -68,12 +53,8 @@ public enum ClassType {
 
         @Override
         public ImageView getImage() {
-            try {
-                return  new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator +  "pictures/interfacepicture.png")));
-            }
-            catch (IOException e){
-                return null;
-            }
+            //  return  new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator +  "pictures/interfacepicture.png")));
+            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/interfaceIcon.png"))));
         }
     },
     PROJECT{
@@ -85,12 +66,8 @@ public enum ClassType {
 
         @Override
         public ImageView getImage(){
-            try {
-                return  new ImageView(new Image(new FileInputStream(getRelativePath() +  File.separator + "pictures/projectpicture.png")));
-            }
-            catch (IOException e){
-                return null;
-            }
+            // return  new ImageView(new Image(new FileInputStream(getRelativePath() +  File.separator + "pictures/projectpicture.png")));
+            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/projectIcon.png"))));
         }
     };
     //returns the type of class (class, enum, project, interface, package)  as a String
