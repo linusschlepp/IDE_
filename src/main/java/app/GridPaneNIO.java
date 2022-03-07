@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import java.awt.*;
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.Buffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -116,7 +117,7 @@ public class GridPaneNIO {
         menuItemClose1.setOnAction(e -> primaryStage.close());
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
-       // ImageView viewMenuItem = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/renameIcon.png")));
+        // ImageView viewMenuItem = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/renameIcon.png")));
         ImageView viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/renameIcon.png"))));
         menuItemRename.setGraphic(viewMenuItem);
         viewMenuItem.setFitHeight(20);
@@ -125,14 +126,14 @@ public class GridPaneNIO {
         menuItemRename.setOnAction(e -> RenameBox.display(getRetTreeItem()));
 
 
-       // viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/terminateIcon.png")));
+        // viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/terminateIcon.png")));
         viewMenu = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/terminateIcon.png"))));
         menuItemDelete.setGraphic(viewMenu);
         menuItemDelete.setOnAction(e -> DeleteBox.display(getRetTreeItem()));
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
         viewMenuItem = CLASS.getImage();
-       // viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/plusIcon.png")));
+        // viewMenu = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/plusIcon.png")));
         viewMenu = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/plusIcon.png"))));
         viewMenuItem.setFitHeight(30);
         viewMenuItem.setPreserveRatio(true);
@@ -170,7 +171,7 @@ public class GridPaneNIO {
                 ex.printStackTrace();
             }
         });
-       // viewMenuItem = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/projectIcon.png")));
+        // viewMenuItem = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/projectIcon.png")));
         viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/projectIcon.png"))));
         viewMenuItem.setFitHeight(17);
         viewMenuItem.setPreserveRatio(true);
@@ -195,7 +196,7 @@ public class GridPaneNIO {
 
             }
         });
-       // viewMenuItem = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/selectProjectIcon.png")));
+        // viewMenuItem = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/selectProjectIcon.png")));
         viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/selectProjectIcon.png"))));
         viewMenuItem.setFitHeight(17);
         viewMenuItem.setPreserveRatio(true);
@@ -264,7 +265,7 @@ public class GridPaneNIO {
         ImageView imageView;
 
         if (treeItem.getValue().getClassType().equals(PACKAGE))
-           // imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/packageIcon.png")));
+            // imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/packageIcon.png")));
             imageView = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/packageIcon.png"))));
         else if (treeItem.getValue().getClassType().equals(CLASS))
             // imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/classIcon.png")));
@@ -273,7 +274,7 @@ public class GridPaneNIO {
             // imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/interfaceIcon.png")));
             imageView = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/interfaceIcon.png"))));
         else
-          //  imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/enumIcon.png")));
+            //  imageView = new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator + "pictures/enumIcon.png")));
             imageView = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/enumIcon.png"))));
         imageView.setFitHeight(15);
         imageView.setPreserveRatio(true);
@@ -322,7 +323,7 @@ public class GridPaneNIO {
 
         return imageView;
 
-      //  return new ImageView();
+        //  return new ImageView();
     }
 
     /**
@@ -380,8 +381,8 @@ public class GridPaneNIO {
             File tempFile = directoryChooser.showDialog(primaryStage);
             path = tempFile != null ? tempFile.getPath() : path;
             fileName = tempFile != null ? tempFile.getName() : fileName;
-            Files.writeString((Paths.get(new File(Objects.requireNonNull(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().
-                    getResource("projectfiles/currentProject")).toURI())).getPath())), path);
+            //TODO: This still requires fixing
+            Files.writeString((Paths.get(Objects.requireNonNull(GridPaneNIO.class.getResource("projectFiles/currentProject")).toURI())), path);
 //            Files.writeString((Paths.get(getRelativePath() + File.separator +
 //                    "projectfiles" + File.separator + "currentProject")), path);
         } catch (Exception e) {
@@ -585,9 +586,12 @@ public class GridPaneNIO {
         try {
 //            BufferedReader br = new BufferedReader(new FileReader(getRelativePath() + File.separator +
 //                    "projectfiles" + File.separator + "currentProject"));
-            //TODO: This has to be fixed for .jar
-            BufferedReader br = new BufferedReader(new FileReader(new File(Objects.requireNonNull(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().
-                    getResource("projectfiles/currentProject")).getPath()))));
+
+//            BufferedReader br = new BufferedReader(new FileReader(Objects.requireNonNull(Objects.requireNonNull(Objects.
+//                    requireNonNull(GridPaneNIO.class.getClassLoader().
+//                    getResource("projectFiles/currentProject")).toURI()).getPath())));
+            BufferedReader br = new BufferedReader(new InputStreamReader(Objects.
+                    requireNonNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("projectFiles/currentProject"))));
             return new File(br.readLine());
         } catch (Exception e) {
             e.printStackTrace();
@@ -603,8 +607,9 @@ public class GridPaneNIO {
         try {
 //            Files.writeString(Paths.get(getRelativePath() + File.separator +
 //                    "projectfiles" + File.separator + "currentProject"), path);
+            //TODO: This still requires fixing
             Files.writeString((Paths.get(new File(Objects.requireNonNull(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().
-                    getResource("projectfiles/currentProject")).toURI())).getPath())), path);
+                    getResource("projectFiles/currentProject")).toURI())).getPath())), path);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
