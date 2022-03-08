@@ -336,13 +336,21 @@ public class GridPaneNIO {
         //   return new File("").getAbsolutePath() + "//" + "src" + "//" + "main" + "//" + "java";
 //        System.out.println(new File(Objects.requireNonNull(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResource("")).getPath())).getPath());
 //        System.out.println("Hallo!");
-        return "C:\\Intellij-Projekte\\IDE_\\src\\main\\java";
+        // return "C:\\Intellij-Projekte\\IDE_\\src\\main\\java";
         // return new File(Objects.requireNonNull(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResource("")).getPath())).getPath();
 
 
 //        return new File(new File(new File(new File(
 //                Objects.requireNonNull(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResource("")))
 //                        .getPath()).getParent()).getParent()).getPath()).getPath() + "\\src\\main\\java";
+        try {
+            return new File(GridPaneNIO.class.getProtectionDomain().getCodeSource().getLocation()
+                    .toURI()).getParentFile().getPath();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return "";
     }
 
     /**
@@ -381,10 +389,13 @@ public class GridPaneNIO {
             File tempFile = directoryChooser.showDialog(primaryStage);
             path = tempFile != null ? tempFile.getPath() : path;
             fileName = tempFile != null ? tempFile.getName() : fileName;
-            //TODO: This still requires fixing
-            Files.writeString((Paths.get(Objects.requireNonNull(GridPaneNIO.class.getResource("projectFiles/currentProject")).toURI())), path);
-//            Files.writeString((Paths.get(getRelativePath() + File.separator +
-//                    "projectfiles" + File.separator + "currentProject")), path);
+
+            Files.writeString((Paths.get(getRelativePath() + File.separator +
+                    "projectFiles" + File.separator + "currentProject")), path);
+
+
+            //textArea gets reseted after selection
+            textArea.setText("");
         } catch (Exception e) {
             e.printStackTrace();
             return;
@@ -584,20 +595,42 @@ public class GridPaneNIO {
     private static File getProjectPath() {
 
         try {
-//            BufferedReader br = new BufferedReader(new FileReader(getRelativePath() + File.separator +
-//                    "projectfiles" + File.separator + "currentProject"));
+            // if the file does not exist yet, it gets created
+            if (!Files.exists(Paths.get(getRelativePath() + File.separator +
+                    "projectFiles" + File.separator + "currentProject"))) {
+                Files.createDirectory(Paths.get(getRelativePath() + File.separator +
+                        "projectFiles"));
+                Files.createFile(Paths.get(getRelativePath() + File.separator +
+                        "projectFiles" + File.separator + "currentProject"));
+            }
+
+            BufferedReader br = new BufferedReader(new FileReader(getRelativePath() + File.separator +
+                    "projectFiles" + File.separator + "currentProject"));
 
 //            BufferedReader br = new BufferedReader(new FileReader(Objects.requireNonNull(Objects.requireNonNull(Objects.
 //                    requireNonNull(GridPaneNIO.class.getClassLoader().
 //                    getResource("projectFiles/currentProject")).toURI()).getPath())));
-            BufferedReader br = new BufferedReader(new InputStreamReader(Objects.
-                    requireNonNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("projectFiles/currentProject"))));
+//            BufferedReader br = new BufferedReader(new InputStreamReader(Objects.
+//                    requireNonNull(Thread.currentThread().getContextClassLoader().getResourceAsStream("projectFiles/currentProject"))));
             return new File(br.readLine());
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            if (e instanceof NullPointerException) {
+                textFlow = new TextFlow();
+                Text projectText = new Text("Please select a file");
+                projectText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+                projectText.setFill(Color.BLACK);
+                Text pathText = new Text(path);
+                pathText.setFill(Color.GRAY);
+                pathText.setFont(Font.font("verdana", FontPosture.REGULAR, 15));
+
+                textFlow.getChildren().addAll(projectText, pathText);
+            } else
+                e.printStackTrace();
         }
+        return null;
     }
+
+
 
     /**
      * Creates/ overwrites the currentProject file
@@ -605,11 +638,10 @@ public class GridPaneNIO {
     private static void createProjectFile() {
 
         try {
-//            Files.writeString(Paths.get(getRelativePath() + File.separator +
-//                    "projectfiles" + File.separator + "currentProject"), path);
-            //TODO: This still requires fixing
-            Files.writeString((Paths.get(new File(Objects.requireNonNull(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().
-                    getResource("projectFiles/currentProject")).toURI())).getPath())), path);
+            Files.writeString(Paths.get(getRelativePath() + File.separator +
+                    "projectfiles" + File.separator + "currentProject"), path);
+            // Clears text area after project file has been created
+            textArea.setText("");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
