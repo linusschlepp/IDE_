@@ -1,5 +1,7 @@
 package app;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -401,7 +403,7 @@ public class GridPaneNIO {
             return;
         }
 
-        textFlow = new TextFlow();
+
         Text projectText = new Text("- " + fileName + " ");
         projectText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
         projectText.setFill(Color.BLACK);
@@ -409,7 +411,9 @@ public class GridPaneNIO {
         pathText.setFill(Color.GRAY);
         pathText.setFont(Font.font("verdana", FontPosture.REGULAR, 15));
 
+
         textFlow.getChildren().addAll(projectText, pathText);
+        gridPane.getChildren().add(textFlow);
         TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(fileName), PROJECT, path));
         treeView.setRoot(TreeItemProject);
         recreateRecProject(new File(path));
@@ -690,6 +694,7 @@ public class GridPaneNIO {
         if (!Files.exists(Paths.get(path)))
             Files.createDirectory(Paths.get(path));
         createProjectFile();
+        textFlow = new TextFlow();
         Text projectText = new Text("- " + fileName + " ");
         projectText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
         projectText.setFill(Color.BLACK);
