@@ -1,5 +1,6 @@
 package app;
 
+import com.sun.source.tree.Tree;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -46,12 +47,13 @@ public class RenameBox {
                     Path source = Paths.get(treeItem.getValue().getPath());
 
                     treeItem.getValue().setBoxText(textField.getText());
-                    //GridPaneNIO.packageNameHashMap.computeIfPresent(oldName, (k,v) -> k=textField.getText())
                     GridPaneNIO.packageNameHashMap.put(textField.getText(), GridPaneNIO.packageNameHashMap.remove(oldName));
                     Files.move(source, source.resolveSibling(textField.getText()));
+
+                    // changes the name of the parent-package
+                    treeItem.getValue().setPath(treeItem.getValue().getPath().replaceAll(oldName, textField.getText()));
                     //takes a recursive-approach changes the content of the children of the package and the children of the packages within in the packages
                     changeClassContentRec(treeItem.getChildren(), textField.getText(), oldName);
-
                 }
                 //if the required TreeItem is of classType enum, interface or class
                 else {
@@ -67,7 +69,9 @@ public class RenameBox {
             } catch (IOException ex) {
                 if (ex instanceof FileAlreadyExistsException)
                     AlertBoxName.display(textField.getText());
-            }finally {
+                else
+                    ex.printStackTrace();
+            } finally {
                 window.close();
             }
         });
@@ -106,6 +110,9 @@ public class RenameBox {
             else
                 changeClassContentRec(t.getChildren(), newName, oldName);
         });
+
+
+
 
 
     }
