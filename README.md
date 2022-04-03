@@ -1,5 +1,4 @@
 # K1vv1 - Java IDE 
-![Logo](./src/main/resources/pictures/AppIcon.png)
 ![image](https://user-images.githubusercontent.com/82322027/161435302-2d03e740-890c-4100-aa58-e4b13470271c.png)
 
 ## General info about the K1vv1 IDE
