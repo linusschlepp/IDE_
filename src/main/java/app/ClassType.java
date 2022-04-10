@@ -19,7 +19,7 @@ public enum ClassType {
         @Override
         public ImageView getImage() {
             // return  new ImageView(new Image(new FileInputStream(getRelativePath() +File.separator + "pictures/packagepicture.png")));
-            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/packageIcon.png"))));
+            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/packageIcon.png"))));
         }
     },
     CLASS{
@@ -30,7 +30,7 @@ public enum ClassType {
         @Override
         public ImageView getImage() {
             // return new ImageView(new Image(new FileInputStream(getRelativePath() +  File.separator + "pictures/classpicture.png")));
-            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/classIcon.png"))));
+            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/classIcon.png"))));
         }
     },
     ENUM{
@@ -42,7 +42,7 @@ public enum ClassType {
         @Override
         public ImageView getImage() {
             // return  new ImageView(new Image(new FileInputStream(getRelativePath() +  File.separator + "pictures/enumpicture.png")));
-            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/enumIcon.png"))));
+            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/enumIcon.png"))));
         }
     },
     INTERFACE{
@@ -54,7 +54,7 @@ public enum ClassType {
         @Override
         public ImageView getImage() {
             //  return  new ImageView(new Image(new FileInputStream(getRelativePath() + File.separator +  "pictures/interfacepicture.png")));
-            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/interfaceIcon.png"))));
+            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/interfaceIcon.png"))));
         }
     },
     PROJECT{
@@ -67,7 +67,7 @@ public enum ClassType {
         @Override
         public ImageView getImage(){
             // return  new ImageView(new Image(new FileInputStream(getRelativePath() +  File.separator + "pictures/projectpicture.png")));
-            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("pictures/projectIcon.png"))));
+            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/projectIcon.png"))));
         }
     };
     //returns the type of class (class, enum, project, interface, package)  as a String
