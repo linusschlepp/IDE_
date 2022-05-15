@@ -7,7 +7,7 @@ The K1vv1 IDE is a very minimlistic and simple Java IDE, which has also been wri
 ## Project was created using:
 * [JavaFx](https://openjfx.io/) 
 * [Maven](https://maven.apache.org/)
-* [CSS](
+* CSS
 
 ## Setup
 To use this project, clone it, by running this command in your terminal/cmd: `git clone https://github.com/linusschlepp/K1vv1_IDE.git`. In order to use this project, you have to install [JavaFx](https://openjfx.io/) and add it to your Maven-dependencies. 
