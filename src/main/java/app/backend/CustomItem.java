@@ -1,4 +1,4 @@
-package app;
+package app.backend;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
@@ -14,7 +14,7 @@ public class CustomItem extends GridPane {
     private TextArea textArea;
     private final ImageView imageView;
     private String path;
-    private ClassType classType;
+    private final ClassType classType;
 
 
     /**
