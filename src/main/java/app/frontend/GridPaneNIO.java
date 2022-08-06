@@ -1,6 +1,8 @@
-package app;
+package app.frontend;
 
 
+import app.backend.ClassType;
+import app.backend.CustomItem;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -29,7 +31,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import static app.ClassType.*;
+import static app.backend.ClassType.*;
 
 //TODO: Main objectives: prepare program for .jar
 
@@ -71,7 +73,7 @@ public class GridPaneNIO {
      *
      * @param primaryStage mainStage, which is getting passed by the main class
      */
-    GridPaneNIO(Stage primaryStage) {
+    public GridPaneNIO(Stage primaryStage) {
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
         GridPaneNIO.primaryStage = primaryStage;
@@ -757,7 +759,7 @@ public class GridPaneNIO {
         TreeItemProject.getChildren().add(treeItem);
 
     }
-    //TODO: Check for files within mulitple packages, if file path is correct
+    //TODO: Check for files within multiple packages, if file path is correct
 
     /**
      * Classes/ files are getting added to the directories in the fileSystem
