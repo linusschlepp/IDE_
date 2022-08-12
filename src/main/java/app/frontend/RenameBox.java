@@ -2,6 +2,7 @@ package app.frontend;
 
 import app.backend.ClassType;
 import app.backend.CustomItem;
+import app.utils.FileUtils;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -89,7 +90,7 @@ public class RenameBox {
         treeItem.getValue().getTextArea().setText(treeItem.getValue().getTextArea().getText()
                 .replaceAll(oldName, newName));
 
-        GridPaneNIO.updateFile(treeItem.getValue().getTextArea().getText(), treeItem.getValue().getPath());
+        FileUtils.updateFile(treeItem.getValue().getTextArea().getText(), treeItem.getValue().getPath());
     }
 
     /**

@@ -101,7 +101,6 @@ public class ClassBox {
     }
 
 
-    //TODO: check if this really works
     /**
      * Helper-method which returns TreeItem, according to its corresponding name
      *
