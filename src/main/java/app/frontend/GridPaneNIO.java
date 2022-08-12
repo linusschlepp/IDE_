@@ -3,6 +3,8 @@ package app.frontend;
 
 import app.backend.ClassType;
 import app.backend.CustomItem;
+import app.utils.CopyUtils;
+import app.utils.FileUtils;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -33,7 +35,6 @@ import java.util.stream.Collectors;
 
 import static app.backend.ClassType.*;
 
-//TODO: Main objectives: prepare program for .jar
 
 public class GridPaneNIO {
 
@@ -189,15 +190,11 @@ public class GridPaneNIO {
         viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/commit.png"))));
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
-       // menuItemCommit.setAccelerator(KeyCombination.keyCombination("Ctrl+K"));
-      //  menuItemCommit.setOnAction(e -> ClassBox.display(CLASS, false));
         menuItemCommit.setGraphic(viewMenuItem);
 
         viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/init.png"))));
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
-      //  menuItemInit.setAccelerator(KeyCombination.keyCombination("Ctrl+K"));
-        //  menuItemCommit.setOnAction(e -> ClassBox.display(CLASS, false));
         menuItemInit.setGraphic(viewMenuItem);
 
         MenuBar menuBar = new MenuBar();
@@ -233,10 +230,10 @@ public class GridPaneNIO {
             //to avoid the addition of too many menuItems within the contextMenu
             if (contextMenuPackages.getItems().isEmpty() && contextMenuClasses.getItems().isEmpty()) {
                 //menuItems get added to contextMenuPackages
-                contextMenuPackages.getItems().addAll(copyMenuItem(menuItemAddClass), copyMenuItem(menuItemAddInterface), copyMenuItem(menuItemAddEnum),
-                        copyMenuItem(menuItemAddPackage), copyMenuItem(menuItemRename), copyMenuItem(menuItemDelete));
+                contextMenuPackages.getItems().addAll(CopyUtils.copyMenuItem(menuItemAddClass), CopyUtils.copyMenuItem(menuItemAddInterface), CopyUtils.copyMenuItem(menuItemAddEnum),
+                        CopyUtils.copyMenuItem(menuItemAddPackage), CopyUtils.copyMenuItem(menuItemRename), CopyUtils.copyMenuItem(menuItemDelete));
                 //menuItems get added to contextMenuClasses
-                contextMenuClasses.getItems().addAll(copyMenuItem(menuItemRename), copyMenuItem(menuItemDelete));
+                contextMenuClasses.getItems().addAll(CopyUtils.copyMenuItem(menuItemRename), CopyUtils.copyMenuItem(menuItemDelete));
             }
             if (newValue != null) {
                 tempTreeItem.set(newValue);
@@ -268,7 +265,7 @@ public class GridPaneNIO {
          */
         textArea.textProperty().addListener((observableValue, s, t1) -> {
             tempTreeItem.get().getValue().setText(t1);
-            updateFile(tempTreeItem.get().getValue().getTextArea().getText(), tempTreeItem.get().getValue().getPath());
+            FileUtils.updateFile(tempTreeItem.get().getValue().getTextArea().getText(), tempTreeItem.get().getValue().getPath());
             setImageLabel(tempTreeItem.get());
             label.setText(tempTreeItem.get().getValue().getLabelText());
         });
@@ -305,84 +302,6 @@ public class GridPaneNIO {
     }
 
     /**
-     * Helper-method, which copies MenuItems. This enables the addition of one MenuItem to multiple ContextMenus
-     *
-     * @param menuItem menuItem, which is getting copied
-     * @return copy of menuItem
-     */
-    private static MenuItem copyMenuItem(MenuItem menuItem) {
-
-        MenuItem menuItemCopy = new MenuItem();
-        menuItemCopy.setText(menuItem.getText());
-        menuItemCopy.setGraphic(copyImageMenuItem(menuItemCopy));
-        menuItemCopy.setOnAction(menuItem.getOnAction());
-
-        return menuItemCopy;
-    }
-
-
-    /**
-     * Helper-method, which returns the Image of the corresponding MenuItem
-     *
-     * @param menuItem the menuItem of which the image is required
-     * @return a copy of the ImageView from menuItem
-     */
-    private static ImageView copyImageMenuItem(MenuItem menuItem) {
-
-        ImageView imageView = new ImageView();
-        switch (menuItem.getText()) {
-            case "Delete" -> imageView = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/terminateIcon.png"))));
-            case "Add Interface" -> imageView = INTERFACE.getImage();
-            case "Add Class" -> imageView = CLASS.getImage();
-            case "Add Enum" -> imageView = ENUM.getImage();
-            case "Add Package" -> imageView = PACKAGE.getImage();
-            case "Rename" -> imageView = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/renameIcon.png"))));
-
-        }
-        imageView.setFitHeight(17);
-        imageView.setPreserveRatio(true);
-
-        return imageView;
-
-    }
-
-    /**
-     * Returns the path, where the IDE is stored
-     *
-     * @return relativePath of the IDE
-     */
-    public static String getRelativePath() {
-
-        try {
-            return new File(GridPaneNIO.class.getProtectionDomain().getCodeSource().getLocation()
-                    .toURI()).getParentFile().getPath();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        return "";
-    }
-
-    /**
-     * When the text in the textArea of each class changes, the content of the file is getting changed as well
-     *
-     * @param fileContent content of the file/ class
-     * @param pathOfFile  the location of the file
-     */
-    static void updateFile(String fileContent, String pathOfFile) {
-
-
-        Path newPath;
-        newPath = pathOfFile.contains(".java") ? Paths.get(pathOfFile) : Paths.get(pathOfFile + ".java");
-        try {
-            Files.writeString(newPath, fileContent);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-    }
-
-    /**
      * Opens File-Explorer and selects location of the project
      *
      * @throws FileNotFoundException NIO-codesegments are getting used
@@ -400,7 +319,7 @@ public class GridPaneNIO {
             path = tempFile != null ? tempFile.getPath() : path;
             fileName = tempFile != null ? tempFile.getName() : fileName;
 
-            Files.writeString((Paths.get(getRelativePath() + "//" +
+            Files.writeString((Paths.get(FileUtils.getRelativePath() + "//" +
                     "projectFiles" + "\\" + "currentProject")), path);
 
 
@@ -428,22 +347,7 @@ public class GridPaneNIO {
 
     }
 
-    /**
-     * Creates files in the requested locations
-     *
-     * @param classContent content of the class/ file
-     * @param className    name of the class/ file
-     */
-    private static void createFile(String classContent, String className) {
 
-        try {
-            if (!Files.exists(Paths.get(path + "\\" + className + ".java")))
-                Files.createFile(Paths.get(path + "\\" + className + ".java"));
-            Files.writeString(Paths.get(path + "\\" + className + ".java"), classContent);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Gets called if a class is only added to the TreeView and not in the fileSystem
@@ -452,28 +356,14 @@ public class GridPaneNIO {
      * @param classKind kind of the class enum, interface etc.
      */
     private static void addClass(File file, ClassType classKind) {
-        TextArea tArea = new TextArea(getClassContent(file));
+        TextArea tArea = new TextArea(FileUtils.getClassContent(file));
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(file.getName().replaceAll(".java", "")),
                 tArea, file.getPath(), classKind));
         TreeItemProject.getChildren().add(treeItem);
         textAreaStringHashMap.put(tArea, file.getName().replaceAll(".java", ""));
     }
 
-    /**
-     * Returns the content of a file as a String variable
-     *
-     * @param file the file, which content is needed
-     * @return content of file-parameter as String
-     */
-    private static String getClassContent(File file) {
-        StringBuilder sb = new StringBuilder();
-        try {
-            Files.lines(Paths.get(String.valueOf(file))).forEach(s -> sb.append(s).append("\n"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
+
 
     /**
      * Gets called if a class only needs to be added in a package in the TreeView and not in the fileSystem
@@ -492,7 +382,7 @@ public class GridPaneNIO {
             packageNameHashMap.put(className, treeItem);
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
         } else {
-            TextArea tArea = new TextArea(getClassContent(file));
+            TextArea tArea = new TextArea(FileUtils.getClassContent(file));
 
 
             treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className),
@@ -545,14 +435,14 @@ public class GridPaneNIO {
                             if (entry.isDirectory() && !entry.getName().equals("output"))
                                 addPackage1(entry.getName(), entry);
                             else if (entry.isFile() && !entry.getName().equals("output"))
-                                addClass(entry, checkForClassType(entry));
+                                addClass(entry, FileUtils.checkForClassType(entry));
                         } else {
                             if (entry.isDirectory() && !entry.getName().equals("output"))
                                 addToPackage(new File(entry.getParent()).getName(),
                                         entry.getPath(), entry.getName(), PACKAGE, entry);
                             else
                                 addToPackage(new File(entry.getParent()).getName(), entry.getPath(),
-                                        entry.getName().replaceAll(".java", ""), checkForClassType(entry), entry);
+                                        entry.getName().replaceAll(".java", ""), FileUtils.checkForClassType(entry), entry);
                         }
 
                         if (entry.isDirectory())
@@ -562,42 +452,16 @@ public class GridPaneNIO {
             }
         } else {
             if (file.getPath().equals(path)) {
-                addClass(file, checkForClassType(file));
+                addClass(file, FileUtils.checkForClassType(file));
             } else {
                 addToPackage(new File(file.getParent()).getName(), file.getPath(),
-                        file.getName().replaceAll(".java", ""), checkForClassType(file), file);
+                        file.getName().replaceAll(".java", ""), FileUtils.checkForClassType(file), file);
             }
 
         }
     }
 
-    /**
-     * Determines the class-type by checking the content of the files for the keywords: enum, interface and class
-     *
-     * @param entry file, which is getting checked
-     * @return the corresponding classType
-     */
-    private static ClassType checkForClassType(File entry) {
 
-        try {
-            String fileContent = Files.lines(Paths.get(entry.getPath())).collect(Collectors.toList()).toString();
-
-            if (fileContent.contains("class"))
-                return CLASS;
-            if (fileContent.contains("enum"))
-                return ENUM;
-            if (fileContent.contains("interface"))
-                return INTERFACE;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-        return CLASS;
-
-
-    }
 
     /**
      * Writes path of file in currentProject
@@ -608,15 +472,15 @@ public class GridPaneNIO {
 
         try {
             // if the file does not exist yet, it gets created
-            if (!Files.exists(Paths.get(getRelativePath() + "\\" +
+            if (!Files.exists(Paths.get(FileUtils.getRelativePath() + "\\" +
                     "projectFiles" + "\\" + "currentProject"))) {
-                Files.createDirectory(Paths.get(getRelativePath() + "\\" +
+                Files.createDirectory(Paths.get(FileUtils.getRelativePath() + "\\" +
                         "projectFiles"));
-                Files.createFile(Paths.get(getRelativePath() + "\\" +
+                Files.createFile(Paths.get(FileUtils.getRelativePath() + "\\" +
                         "projectFiles" + "\\" + "currentProject"));
             }
 
-            BufferedReader br = new BufferedReader(new FileReader(getRelativePath() + "\\" +
+            BufferedReader br = new BufferedReader(new FileReader(FileUtils.getRelativePath() + "\\" +
                     "projectFiles" + "\\" + "currentProject"));
 
 
@@ -646,7 +510,7 @@ public class GridPaneNIO {
     private static void createProjectFile() {
 
         try {
-            Files.writeString(Paths.get(getRelativePath() + "\\" +
+            Files.writeString(Paths.get(FileUtils.getRelativePath() + "\\" +
                     "projectFiles" + "\\" + "currentProject"), path);
             // Clears text area after project file has been created
             textArea.setText("");
@@ -655,28 +519,7 @@ public class GridPaneNIO {
         }
     }
 
-    /**
-     * Creates Files within packages  in the fileSystem
-     *
-     * @param classContent content of the class/ file
-     * @param packageName  name of the package/ directory
-     * @param className    name of the file
-     * @param isPackage    checks if file is a package and if a directory has to be created
-     */
-    private static void createFile(String classContent, String packageName, String className, boolean isPackage) {
 
-        try {
-            if (!isPackage) {
-                Path newFile = Files.createFile(Paths.get(path + packageName + className + ".java"));
-                Files.writeString(newFile, classContent);
-            } else {
-                if (!Files.exists(Paths.get(path + packageName + className)))
-                    Files.createDirectory(Paths.get(path + packageName + className));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Opens fileDialog window and saves in the project in the requested location
@@ -770,7 +613,7 @@ public class GridPaneNIO {
 
         TreeItemProject.getChildren().add(treeItem);
         textAreaStringHashMap.put(tArea, className);
-        createFile(tArea.getText(), className);
+        FileUtils.createFile(path, tArea.getText(), className);
     }
 
     /**
@@ -788,7 +631,7 @@ public class GridPaneNIO {
         TreeItemProject.getChildren().add(treeItem);
 
     }
-    //TODO: Check for files within multiple packages, if file path is correct
+
 
     /**
      * Classes/ files are getting added to the directories in the fileSystem
@@ -808,7 +651,7 @@ public class GridPaneNIO {
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
 
 
-            createFile("", getCorrectPath(treeItem), className, true);
+            FileUtils.createFile(path, "", getCorrectPath(treeItem), className, true);
         } else {
             TextArea tArea = generateTextAreaContent(packageName, className, classKind);
             treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className),
@@ -816,7 +659,7 @@ public class GridPaneNIO {
             textAreaStringHashMap.put(tArea, className);
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
             treeItem.getValue().setPath(path + getCorrectPath(treeItem) + className);
-            createFile(tArea.getText(), getCorrectPath(treeItem), className, false);
+            FileUtils.createFile(path, tArea.getText(), getCorrectPath(treeItem), className, false);
 
         }
     }
@@ -839,7 +682,7 @@ public class GridPaneNIO {
     }
 
     /**
-     * gets right path of packages
+     * Gets right path of packages
      */
     public static String getCorrectPath(TreeItem<CustomItem> treeItem) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -905,8 +748,8 @@ public class GridPaneNIO {
         listFiles = new ArrayList<>();
         try {
             findFilesRec(new File(path));
-            generateOutputFolder();
-            copyDirectory(path, path + "\\" + "output");
+            FileUtils.generateOutputFolder(path);
+            FileUtils.copyDirectory(path, path + "\\" + "output");
             findPairs();
             AtomicReference<String> nameMain = new AtomicReference<>("");
             AtomicReference<String> pathMain = new AtomicReference<>("");
@@ -953,51 +796,6 @@ public class GridPaneNIO {
             }
         } else
             listFiles.add(dir);
-    }
-
-    /**
-     * Output-folder is getting created, files are getting stored in it
-     *
-     * @throws IOException new files are getting instantiated
-     */
-    private void generateOutputFolder() throws IOException {
-
-        //Output-Folder gets deleted before every execution of the program
-        if (Files.exists(Paths.get(path + "\\" + "output")))
-            Files.walk(Paths.get(path + "\\" + "output")).sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
-
-        try {
-            //if the output-folder doesn't exist yet, it is getting created
-            Files.createDirectory(Paths.get(path + "\\" + "output"));
-        }catch(FileAlreadyExistsException ignored){
-
-        }
-
-
-    }
-
-    /**
-     * Copies directories the contents of the source-directory into the directory
-     *
-     * @param sourceDirectoryLocation      path of the individual project
-     * @param destinationDirectoryLocation path of the output folder
-     * @throws IOException NIO-segments are getting used
-     */
-    public static void copyDirectory(String sourceDirectoryLocation, String destinationDirectoryLocation) throws IOException {
-
-        Files.walk(Paths.get(sourceDirectoryLocation))
-                .forEach(source -> {
-                    Path destination = Paths.get(destinationDirectoryLocation, source.toString()
-                            .substring(sourceDirectoryLocation.length()));
-                    try {
-                        if (!source.getFileName().toString().equals("output"))
-                            Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
-                    } catch (IOException ignored) {
-
-                    }
-                });
     }
 
 
