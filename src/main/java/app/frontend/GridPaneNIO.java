@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -92,9 +93,8 @@ public class GridPaneNIO {
 
     /**
      * Creates the Stage as well as the layout
-     *
      */
-    public void start()  {
+    public void start() {
 
 
         menuExecute.getItems().add(menuItemExec1);
@@ -124,7 +124,6 @@ public class GridPaneNIO {
         viewMenuItem.setPreserveRatio(true);
 
         menuItemRename.setOnAction(e -> RenameBox.display(getRetTreeItem()));
-
 
 
         viewMenu = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/terminateIcon.png"))));
@@ -222,7 +221,6 @@ public class GridPaneNIO {
         viewMenuItem.setPreserveRatio(true);
         menuItemSelectProject.setGraphic(viewMenuItem);
         //items get added to contextMenuPackages
-
 
 
         AtomicReference<TreeItem<CustomItem>> tempTreeItem = new AtomicReference<>();
@@ -348,7 +346,6 @@ public class GridPaneNIO {
     }
 
 
-
     /**
      * Gets called if a class is only added to the TreeView and not in the fileSystem
      *
@@ -362,7 +359,6 @@ public class GridPaneNIO {
         TreeItemProject.getChildren().add(treeItem);
         textAreaStringHashMap.put(tArea, file.getName().replaceAll(".java", ""));
     }
-
 
 
     /**
@@ -462,7 +458,6 @@ public class GridPaneNIO {
     }
 
 
-
     /**
      * Writes path of file in currentProject
      *
@@ -503,7 +498,6 @@ public class GridPaneNIO {
     }
 
 
-
     /**
      * Creates/ overwrites the currentProject file
      */
@@ -518,7 +512,6 @@ public class GridPaneNIO {
             ex.printStackTrace();
         }
     }
-
 
 
     /**
@@ -758,22 +751,29 @@ public class GridPaneNIO {
                 if (isMain(k.getText().replaceAll(" ", "")))
                     nameMain.set(textAreaStringHashMap.get(k));
             });
-            nameMain.set(nameMain+".java");
+            nameMain.set(nameMain + ".java");
             listFiles.forEach(f -> {
-                if(nameMain.get().equals(f.getName())){
+                if (nameMain.get().equals(f.getName())) {
                     pathMain.set(f.getPath());
                 }
             });
             //cmd is getting called, java files are compiled and executed
             String relativePathMain = pathMain.get().replace(path + "\\", "");
-                       Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"cd " + path +
-                   "\\" + "output" + "&&" + "javac -cp " + path + "\\" +"output" +
-                               " " +  path + "\\" +"output" + "\\"+ relativePathMain +
-                               "&&" + "java "+ relativePathMain +  "\"");
+
+//            Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"cd " + path +
+//                    "\\" + "output" + "&&" + "javac -cp " + path + "\\" + "output" +
+//                    " " + path + "\\" + "output" + "\\" + relativePathMain +
+//                    "&&" + "java " + relativePathMain + "\"");
+
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            processBuilder.directory(new File(path + "\\" + "output"));
+            processBuilder.command("cmd.exe", "/C", "start", "javac", "-cp", path + "\\" + "output", path + "\\" + "output" + "\\" + relativePathMain).start();
+            TimeUnit.MILLISECONDS.sleep(1000);
+            processBuilder.command("cmd.exe", "/C", "start", "cmd.exe", "/K", "java", relativePathMain + "\"").start();
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
     }
 
     /**
@@ -831,7 +831,6 @@ public class GridPaneNIO {
                     break;
                 }
             }
-
             counter++;
         }
 
