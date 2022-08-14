@@ -70,7 +70,8 @@ public class RenameBox {
                 }
             } catch (IOException ex) {
                 if (ex instanceof FileAlreadyExistsException)
-                    AlertBoxName.display(textField.getText());
+                    AlertBox.display("A file with the name: " + textField.getText() +
+                            " already exists, please choose a different name");
                 else
                     ex.printStackTrace();
             } finally {
@@ -94,7 +95,7 @@ public class RenameBox {
     }
 
     /**
-     * Recursive method, which changes the content of files withing packages and of the files within packages within packages and so on...
+     * Recursive method, which changes the content of files withing packages and of the files within packages, within packages and so on...
      *
      * @param list    children of treeItem (package)
      * @param newName new Name of parent-treeItem
