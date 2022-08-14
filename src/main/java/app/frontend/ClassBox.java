@@ -96,7 +96,7 @@ public class ClassBox {
             });
             //if the path is empty the AlertBox will be displayed
         } else
-            AlertBox.display();
+            AlertBox.display("Create project first");
 
     }
 

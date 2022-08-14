@@ -5,6 +5,7 @@ import app.backend.ClassType;
 import app.backend.CustomItem;
 import app.utils.CopyUtils;
 import app.utils.FileUtils;
+import app.utils.GitUtils;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -190,11 +191,23 @@ public class GridPaneNIO {
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         menuItemCommit.setGraphic(viewMenuItem);
+        menuItemCommit.setOnAction(e -> {
+            CommitBox.display(path);
+            // GitUtils.gitCommit(path);
+        });
+
 
         viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/init.png"))));
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         menuItemInit.setGraphic(viewMenuItem);
+        menuItemInit.setOnAction(e -> {
+            try {
+                GitUtils.gitInit(path);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
 
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(menuAdd, menuExecute, menuGit, menuClose);
@@ -370,7 +383,8 @@ public class GridPaneNIO {
      * @param classKind   kind of the class enum, interface etc.
      * @param file        individual file
      */
-    public static void addToPackage(String packageName, String filePath, String className, ClassType classKind, File file) {
+    public static void addToPackage(String packageName, String filePath, String className, ClassType
+            classKind, File file) {
 
         TreeItem<CustomItem> treeItem;
         if (classKind.equals(PACKAGE)) {
@@ -423,17 +437,17 @@ public class GridPaneNIO {
     private static void recreateRecProject(File file) {
 
         if (file.isDirectory()) {
-            if (!file.getName().equals("output")) {
+            if (!file.getName().equals("output") && !file.getName().equals(".git")) {
                 File[] entries = file.listFiles();
                 if (entries != null) {
                     for (File entry : entries) {
                         if (file.getPath().equals(path)) {
-                            if (entry.isDirectory() && !entry.getName().equals("output"))
+                            if (entry.isDirectory() && !entry.getName().equals("output") && !entry.getName().equals(".git"))
                                 addPackage1(entry.getName(), entry);
-                            else if (entry.isFile() && !entry.getName().equals("output"))
+                            else if (entry.isFile() && !entry.getName().equals("output") && !entry.getName().equals(".git"))
                                 addClass(entry, FileUtils.checkForClassType(entry));
                         } else {
-                            if (entry.isDirectory() && !entry.getName().equals("output"))
+                            if (entry.isDirectory() && !entry.getName().equals("output") && !entry.getName().equals(".git"))
                                 addToPackage(new File(entry.getParent()).getName(),
                                         entry.getPath(), entry.getName(), PACKAGE, entry);
                             else
@@ -634,7 +648,8 @@ public class GridPaneNIO {
      * @param classKind   kind of the class enum, interface etc.
      * @throws FileNotFoundException gets thrown because createFile-method is getting called
      */
-    public static void addToPackage(String packageName, String className, ClassType classKind, File file) throws FileNotFoundException {
+    public static void addToPackage(String packageName, String className, ClassType classKind, File file) throws
+            FileNotFoundException {
 
         TreeItem<CustomItem> treeItem;
 
@@ -783,7 +798,7 @@ public class GridPaneNIO {
      */
     static void findFilesRec(File dir) {
         if (dir.isDirectory()) {
-            if (!dir.getName().equals("output")) {
+            if (!dir.getName().equals("output") && !dir.getName().equals(".git")) {
                 File[] entries = dir.listFiles();
                 if (entries != null) {
                     for (File entry : entries) {
@@ -807,12 +822,13 @@ public class GridPaneNIO {
         File[] dir = new File(path + "\\" + "output").listFiles();
         int counter = 0;
 
+        if (dir == null)
+            return;
 
         for (File f : listFiles) {
             String tempPath;
             Path tempFile;
 
-            assert dir != null;
             for (File f1 : dir) {
                 if (f1.isDirectory() || !f1.getName().contains(".class"))
                     continue;
