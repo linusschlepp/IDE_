@@ -6,10 +6,7 @@ import app.utils.FileUtils;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TreeItem;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -70,7 +67,7 @@ public class RenameBox {
                 }
             } catch (IOException ex) {
                 if (ex instanceof FileAlreadyExistsException)
-                    AlertBox.display("A file with the name: " + textField.getText() +
+                    AlertBox.display(Alert.AlertType.WARNING, "A file with the name: " + textField.getText() +
                             " already exists, please choose a different name");
                 else
                     ex.printStackTrace();

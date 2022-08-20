@@ -2,6 +2,7 @@ package app.utils;
 
 import app.frontend.AlertBox;
 import app.frontend.CommitBox;
+import javafx.scene.control.Alert;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -24,9 +25,9 @@ public class GitUtils {
             new ProcessBuilder().directory(new File(path))
                     .command("cmd.exe", "/C", "start", "git", "init").start();
 
-            AlertBox.display("Git-Repository has been successfully initialized");
+            AlertBox.display(Alert.AlertType.INFORMATION, "Git-Repository has been successfully initialized");
         } else
-            AlertBox.display("Git-Repository has already been initialized");
+            AlertBox.display(Alert.AlertType.WARNING ,"Git-Repository has already been initialized");
 
     }
 
@@ -57,7 +58,7 @@ public class GitUtils {
                             "\"").start();
 
         } else
-            AlertBox.display("A Git-Repository has to be initialized first");
+            AlertBox.display(Alert.AlertType.WARNING, "A Git-Repository has to be initialized first");
 
         gitLog(path);
     }
