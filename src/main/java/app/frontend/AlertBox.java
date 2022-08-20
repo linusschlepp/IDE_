@@ -10,8 +10,8 @@ import javafx.scene.layout.Region;
  */
 public class AlertBox {
 
-    public static void display(String message){
-        Alert alert = new Alert(Alert.AlertType.WARNING, message, ButtonType.OK);
+    public static void display(Alert.AlertType alertType, String message){
+        Alert alert = new Alert(alertType, message, ButtonType.OK);
         alert.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
         alert.show();
     }
