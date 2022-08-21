@@ -36,7 +36,7 @@ public class CommitBox {
 
         button.setOnAction( e-> {
             try {
-                GitUtils.gitCommit(path, textField.getText());
+                GitUtils.gitCommit(textField.getText());
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

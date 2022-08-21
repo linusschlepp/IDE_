@@ -17,10 +17,10 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) {
 
         GridPaneNIO grid = new GridPaneNIO(primaryStage);
-        grid.start();
+        grid.init();
 
 
     }

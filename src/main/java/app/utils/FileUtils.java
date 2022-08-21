@@ -141,9 +141,6 @@ public class FileUtils {
         }
     }
 
-
-
-
     /**
      * Determines the class-type by checking the content of the files for the keywords: enum, interface and class
      *
