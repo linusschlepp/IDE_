@@ -3,6 +3,7 @@ package app.frontend;
 
 import app.backend.ClassType;
 import app.backend.CustomItem;
+import app.utils.Constants;
 import app.utils.CopyUtils;
 import app.utils.FileUtils;
 import app.utils.GitUtils;
@@ -45,7 +46,7 @@ public class GridPaneNIO {
     TreeItem<CustomItem> retTreeItem;
     static StringBuilder sb = new StringBuilder();
     static TextFlow textFlow = new TextFlow();
-    public static String path = "";
+    public static String path = Constants.EMPTY_STRING;
     static HashMap<String, TreeItem<CustomItem>> packageNameHashMap = new HashMap<>();
     static HashMap<TextArea, String> textAreaStringHashMap = new HashMap<>();
     static TreeView<CustomItem> treeView = new TreeView<>();
@@ -68,7 +69,7 @@ public class GridPaneNIO {
     MenuItem menuItemCommit = new Menu("Create Commit");
     static GridPane gridPane = new GridPane();
     static TreeItem<CustomItem> TreeItemProject;
-    static String fileName = "";
+    static String fileName = Constants.EMPTY_STRING;
     static TextArea textArea = new TextArea();
     static List<File> listFiles = new ArrayList<>();
     ContextMenu contextMenuPackages;
@@ -104,7 +105,7 @@ public class GridPaneNIO {
         menuClose.getItems().add(menuItemClose1);
         menuGit.getItems().addAll(menuItemInit, menuItemCommit);
 
-        primaryStage.setTitle("K1vv1 IDE");
+        primaryStage.setTitle(Constants.IDE_NAME);
 
         ImageView viewMenu = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/greenPlay.png"))));
         menuExecute.setGraphic(viewMenu);
@@ -202,9 +203,7 @@ public class GridPaneNIO {
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         menuItemCommit.setGraphic(viewMenuItem);
-        menuItemCommit.setOnAction(e -> {
-            CommitBox.display(path);
-        });
+        menuItemCommit.setOnAction(e -> CommitBox.display());
 
         // TODO: Find out, why this image is not added!
         viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/plusIcon.png"))));
@@ -266,10 +265,11 @@ public class GridPaneNIO {
             //to avoid the addition of too many menuItems within the contextMenu
             if (contextMenuPackages.getItems().isEmpty() && contextMenuClasses.getItems().isEmpty()) {
                 //menuItems get added to contextMenuPackages
-                contextMenuPackages.getItems().addAll(CopyUtils.copyMenuItem(menuItemAddClass), CopyUtils.copyMenuItem(menuItemAddInterface), CopyUtils.copyMenuItem(menuItemAddEnum),
-                        CopyUtils.copyMenuItem(menuItemAddPackage), CopyUtils.copyMenuItem(menuItemRename), CopyUtils.copyMenuItem(menuItemDelete), CopyUtils.copyMenuItem(menutItemAddGit));
+                contextMenuPackages.getItems().addAll(CopyUtils.copyMenuItem(menuItemAddClass), CopyUtils.copyMenuItem(menuItemAddInterface),
+                        CopyUtils.copyMenuItem(menuItemAddEnum), CopyUtils.copyMenuItem(menuItemAddPackage), CopyUtils.copyMenuItem(menuItemRename), CopyUtils.copyMenuItem(menuItemDelete), CopyUtils.copyMenuItem(menutItemAddGit));
                 //menuItems get added to contextMenuClasses
-                contextMenuClasses.getItems().addAll(CopyUtils.copyMenuItem(menuItemRename), CopyUtils.copyMenuItem(menuItemDelete), CopyUtils.copyMenuItem(menutItemAddGit));
+                contextMenuClasses.getItems().addAll(CopyUtils.copyMenuItem(menuItemRename), CopyUtils.copyMenuItem(menuItemDelete),
+                        CopyUtils.copyMenuItem(menutItemAddGit));
             }
             if (newValue != null) {
                 tempTreeItem.set(newValue);
@@ -306,7 +306,7 @@ public class GridPaneNIO {
             label.setText(tempTreeItem.get().getValue().getLabelText());
         });
 
-        scene.getStylesheets().add("styles/style.css");
+        scene.getStylesheets().add(Constants.ROOT_STYLE_SHEET);
 
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -341,7 +341,6 @@ public class GridPaneNIO {
      * Opens File-Explorer and selects location of the project
      *
      * @throws FileNotFoundException NIO-codesegments are getting used
-     * @throws NullPointerException  when no project path is getting chosen
      */
     private static void selectProject() throws FileNotFoundException {
 
@@ -355,24 +354,24 @@ public class GridPaneNIO {
             path = tempFile != null ? tempFile.getPath() : path;
             fileName = tempFile != null ? tempFile.getName() : fileName;
 
-            Files.writeString((Paths.get(FileUtils.getRelativePath() + "//" +
-                    "projectFiles" + "\\" + "currentProject")), path);
+            Files.writeString((Paths.get(FileUtils.getRelativePath() + Constants.FILE_SEPARATOR +
+                    Constants.PROJECT_FILES + Constants.FILE_SEPARATOR + Constants.CURRENT_PROJECT)), path);
 
 
             //textArea gets reseted after selection
-            textArea.setText("");
+            textArea.setText(Constants.EMPTY_STRING);
         } catch (Exception e) {
             e.printStackTrace();
             return;
         }
 
 
-        Text projectText = new Text("- " + fileName + " ");
-        projectText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+        Text projectText = new Text(Constants.HYPHEN + Constants.SPACE_STRING + fileName + Constants.SPACE_STRING);
+        projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
         projectText.setFill(Color.BLACK);
         Text pathText = new Text(path);
         pathText.setFill(Color.GRAY);
-        pathText.setFont(Font.font("verdana", FontPosture.REGULAR, 15));
+        pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
 
 
         textFlow.getChildren().addAll(projectText, pathText);
@@ -392,10 +391,10 @@ public class GridPaneNIO {
      */
     private static void addClass(File file, ClassType classKind) {
         TextArea tArea = new TextArea(FileUtils.getClassContent(file));
-        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(file.getName().replaceAll(".java", "")),
+        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(file.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING)),
                 tArea, file.getPath(), classKind));
         TreeItemProject.getChildren().add(treeItem);
-        textAreaStringHashMap.put(tArea, file.getName().replaceAll(".java", ""));
+        textAreaStringHashMap.put(tArea, file.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING));
     }
 
 
@@ -418,8 +417,7 @@ public class GridPaneNIO {
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
         } else {
             TextArea tArea = new TextArea(FileUtils.getClassContent(file));
-
-
+            
             treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className),
                     tArea, filePath, classKind));
 
@@ -462,22 +460,23 @@ public class GridPaneNIO {
     private static void recreateRecProject(File file) {
 
         if (file.isDirectory()) {
-            if (!file.getName().equals("output") && !file.getName().equals(".git")) {
+            if (!file.getName().equals(Constants.OUTPUT_DIR) && !file.getName().equals(Constants.GIT_DIR)) {
                 File[] entries = file.listFiles();
                 if (entries != null) {
                     for (File entry : entries) {
                         if (file.getPath().equals(path)) {
-                            if (entry.isDirectory() && !entry.getName().equals("output") && !entry.getName().equals(".git"))
+                            if (entry.isDirectory() && !entry.getName().equals(Constants.OUTPUT_DIR) && !entry.getName().equals(Constants.GIT_DIR))
                                 addPackage1(entry.getName(), entry);
-                            else if (entry.isFile() && !entry.getName().equals("output") && !entry.getName().equals(".git"))
+                            else if (entry.isFile() && !entry.getName().equals(Constants.OUTPUT_DIR) && !entry.getName().equals(Constants.GIT_DIR))
                                 addClass(entry, FileUtils.checkForClassType(entry));
                         } else {
-                            if (entry.isDirectory() && !entry.getName().equals("output") && !entry.getName().equals(".git"))
+                            if (entry.isDirectory() && !entry.getName().equals(Constants.OUTPUT_DIR) && !entry.getName().equals(Constants.GIT_DIR))
                                 addToPackage(new File(entry.getParent()).getName(),
                                         entry.getPath(), entry.getName(), PACKAGE, entry);
                             else
                                 addToPackage(new File(entry.getParent()).getName(), entry.getPath(),
-                                        entry.getName().replaceAll(".java", ""), FileUtils.checkForClassType(entry), entry);
+                                        entry.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING), 
+                                        FileUtils.checkForClassType(entry), entry);
                         }
                         if (entry.isDirectory())
                             recreateRecProject(entry);
@@ -489,13 +488,12 @@ public class GridPaneNIO {
                 addClass(file, FileUtils.checkForClassType(file));
             } else {
                 addToPackage(new File(file.getParent()).getName(), file.getPath(),
-                        file.getName().replaceAll(".java", ""), FileUtils.checkForClassType(file), file);
+                        file.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING), FileUtils.checkForClassType(file), file);
             }
 
         }
     }
-
-
+    
     /**
      * Writes path of file in currentProject
      *
@@ -505,28 +503,28 @@ public class GridPaneNIO {
 
         try {
             // if the file does not exist yet, it gets created
-            if (!Files.exists(Paths.get(FileUtils.getRelativePath() + "\\" +
-                    "projectFiles" + "\\" + "currentProject"))) {
-                Files.createDirectory(Paths.get(FileUtils.getRelativePath() + "\\" +
-                        "projectFiles"));
-                Files.createFile(Paths.get(FileUtils.getRelativePath() + "\\" +
-                        "projectFiles" + "\\" + "currentProject"));
+            if (!Files.exists(Paths.get(FileUtils.getRelativePath() + Constants.FILE_SEPARATOR +
+                    Constants.PROJECT_FILES + Constants.FILE_SEPARATOR + Constants.CURRENT_PROJECT))) {
+                Files.createDirectory(Paths.get(FileUtils.getRelativePath() + Constants.FILE_SEPARATOR +
+                        Constants.PROJECT_FILES));
+                Files.createFile(Paths.get(FileUtils.getRelativePath() + Constants.FILE_SEPARATOR +
+                        Constants.PROJECT_FILES + Constants.FILE_SEPARATOR + Constants.CURRENT_PROJECT));
             }
 
-            BufferedReader br = new BufferedReader(new FileReader(FileUtils.getRelativePath() + "\\" +
-                    "projectFiles" + "\\" + "currentProject"));
+            try(BufferedReader br = new BufferedReader(new FileReader(FileUtils.getRelativePath() + Constants.FILE_SEPARATOR +
+                    Constants.PROJECT_FILES + Constants.FILE_SEPARATOR + Constants.CURRENT_PROJECT))) {
 
-
-            return new File(br.readLine());
+                return new File(br.readLine());
+            }
         } catch (Exception e) {
             if (e instanceof NullPointerException) {
                 textFlow = new TextFlow();
-                Text projectText = new Text("Please select a file");
-                projectText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+                Text projectText = new Text(Constants.SELECT_FILE);
+                projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
                 projectText.setFill(Color.BLACK);
                 Text pathText = new Text(path);
                 pathText.setFill(Color.GRAY);
-                pathText.setFont(Font.font("verdana", FontPosture.REGULAR, 15));
+                pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
 
                 textFlow.getChildren().addAll(projectText, pathText);
             } else
@@ -542,10 +540,10 @@ public class GridPaneNIO {
     private static void createProjectFile() {
 
         try {
-            Files.writeString(Paths.get(FileUtils.getRelativePath() + "\\" +
-                    "projectFiles" + "\\" + "currentProject"), path);
+            Files.writeString(Paths.get(FileUtils.getRelativePath() + Constants.FILE_SEPARATOR +
+                    Constants.PROJECT_FILES + Constants.FILE_SEPARATOR + Constants.CURRENT_PROJECT), path);
             // Clears text area after project file has been created
-            textArea.setText("");
+            textArea.setText(Constants.EMPTY_STRING);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -564,8 +562,8 @@ public class GridPaneNIO {
         packageNameHashMap = new HashMap<>();
         listFiles.clear();
 
-        FileDialog fd = new FileDialog(new Frame(), "Select the location for your project", FileDialog.SAVE);
-        fd.setDirectory("C:\\");
+        FileDialog fd = new FileDialog(new Frame(), Constants.SELECT_LOCATION, FileDialog.SAVE);
+        fd.setDirectory(Constants.C_ROOT);
         fd.setVisible(true);
         fileName = fd.getFile() != null ? fd.getFile() : fileName;
         path = fd.getFile() != null && fd.getDirectory() != null ? fd.getDirectory() + fd.getFile() : path;
@@ -573,12 +571,12 @@ public class GridPaneNIO {
             Files.createDirectory(Paths.get(path));
         createProjectFile();
         textFlow = new TextFlow();
-        Text projectText = new Text("- " + fileName + " ");
-        projectText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+        Text projectText = new Text(Constants.HYPHEN + Constants.SPACE_STRING + fileName + Constants.SPACE_STRING);
+        projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
         projectText.setFill(Color.BLACK);
         Text pathText = new Text(path);
         pathText.setFill(Color.GRAY);
-        pathText.setFont(Font.font("verdana", FontPosture.REGULAR, 15));
+        pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
 
         textFlow.getChildren().addAll(projectText, pathText);
         TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(fileName), PROJECT, path));
@@ -594,12 +592,12 @@ public class GridPaneNIO {
         path = currentPath.getPath();
         fileName = currentPath.getName();
         textFlow = new TextFlow();
-        Text projectText = new Text("- " + currentPath.getName() + " ");
-        projectText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 15));
+        Text projectText = new Text(Constants.HYPHEN + Constants.SPACE_STRING + currentPath.getName() + Constants.SPACE_STRING);
+        projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
         projectText.setFill(Color.BLACK);
         Text pathText = new Text(path);
         pathText.setFill(Color.GRAY);
-        pathText.setFont(Font.font("verdana", FontPosture.REGULAR, 15));
+        pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
 
 
         textFlow.getChildren().addAll(projectText, pathText);
@@ -616,7 +614,7 @@ public class GridPaneNIO {
      */
     private boolean isMain(String content) {
 
-        return content.contains("publicstaticvoidmain(String[]args)");
+        return content.contains(Constants.PSVM);
     }
 
     /**
@@ -640,7 +638,7 @@ public class GridPaneNIO {
 //        });
         //TreeItem is getting created
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(),
-                new Label(className), tArea, path + "\\" + className + ".java", classKind));
+                new Label(className), tArea, path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION, classKind));
 
         TreeItemProject.getChildren().add(treeItem);
         textAreaStringHashMap.put(tArea, className);
@@ -657,8 +655,8 @@ public class GridPaneNIO {
 
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(PACKAGE.getImage(), new Label(packageName), PACKAGE, file.getPath()));
         packageNameHashMap.put(packageName, treeItem);
-        if (!Files.exists(Paths.get(path + "\\" + packageName)))
-            Files.createDirectory(Paths.get(path + "\\" + packageName));
+        if (!Files.exists(Paths.get(path + Constants.FILE_SEPARATOR + packageName)))
+            Files.createDirectory(Paths.get(path + Constants.FILE_SEPARATOR + packageName));
         TreeItemProject.getChildren().add(treeItem);
 
     }
@@ -683,11 +681,12 @@ public class GridPaneNIO {
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
 
 
-            FileUtils.createFile(path, "", getCorrectPath(treeItem), className, true);
+            FileUtils.createFile(path, Constants.EMPTY_STRING, getCorrectPath(treeItem), className, true);
         } else {
             TextArea tArea = generateTextAreaContent(packageName, className, classKind);
             treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className),
-                    tArea, path + "\\" + packageName + "\\" + className + ".java", classKind));
+                    tArea, path + Constants.FILE_SEPARATOR + packageName + 
+                    Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION, classKind));
             textAreaStringHashMap.put(tArea, className);
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
             treeItem.getValue().setPath(path + getCorrectPath(treeItem) + className);
@@ -731,22 +730,22 @@ public class GridPaneNIO {
             ex.printStackTrace();
         }
 
-        sb.append("package ");
+        sb.append(Constants.PACKAGE_STRING +Constants.SPACE_STRING);
 
-        stringBuilder.append(File.separator);
+        stringBuilder.append(Constants.FILE_SEPARATOR);
         for (int i = stringList.size() - 1; i >= 0; i--) {
-            stringBuilder.append(stringList.get(i)).append(File.separator);
+            stringBuilder.append(stringList.get(i)).append(Constants.FILE_SEPARATOR);
             if (!stringList.get(i).equals(fileName))
                 sb.append(stringList.get(i));
             if (i > 0)
-                sb.append(".");
+                sb.append(Constants.DOT);
         }
 
 
-        sb.append(";").append("\n\n");
+        sb.append(Constants.SEMI_COLON).append(Constants.DOUBLE_NEW_LINE);
 
 
-        return stringBuilder.toString().contains(fileName) ? stringBuilder.toString().replaceAll(fileName, "") :
+        return stringBuilder.toString().contains(fileName) ? stringBuilder.toString().replaceAll(fileName, Constants.EMPTY_STRING) :
                 stringBuilder.toString();
     }
 
@@ -760,11 +759,12 @@ public class GridPaneNIO {
      */
     private static String getClassContent(String classContent, String className) {
 
-        sb.append("public ").append(className).append(" ").append(classContent).append("{").append("\n\n");
+        sb.append(Constants.PUBLIC+Constants.SPACE_STRING).append(className).append(Constants.SPACE_STRING).append(classContent).append(Constants.CURLY_BRACKETS_OPEN)
+                .append(Constants.DOUBLE_NEW_LINE);
         //if it's the main-class, the main-method-head is getting added
         if (ClassBox.isSelected)
-            sb.append("public static void main (String[] args) {").append("\n\n").append("}").append("\n\n");
-        sb.append("}");
+            sb.append(Constants.PSVM_INPUT).append(Constants.DOUBLE_NEW_LINE).append(Constants.CURLY_BRACKETS_CLOSE).append(Constants.DOUBLE_NEW_LINE);
+        sb.append(Constants.CURLY_BRACKETS_CLOSE);
         String retString = sb.toString();
         sb.setLength(0);
 
@@ -781,34 +781,36 @@ public class GridPaneNIO {
         try {
             findFilesRec(new File(path));
             FileUtils.generateOutputFolder(path);
-            FileUtils.copyDirectory(path, path + "\\" + "output");
+            FileUtils.copyDirectory(path, path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR);
             findPairs();
-            AtomicReference<String> nameMain = new AtomicReference<>("");
-            AtomicReference<String> pathMain = new AtomicReference<>("");
+            AtomicReference<String> nameMain = new AtomicReference<>(Constants.EMPTY_STRING);
+            AtomicReference<String> pathMain = new AtomicReference<>(Constants.EMPTY_STRING);
             //nameMain is getting initialized
             textAreaStringHashMap.forEach((k, v) -> {
-                if (isMain(k.getText().replaceAll(" ", "")))
+                if (isMain(k.getText().replaceAll(Constants.SPACE_STRING, Constants.EMPTY_STRING)))
                     nameMain.set(textAreaStringHashMap.get(k));
             });
-            nameMain.set(nameMain + ".java");
+            nameMain.set(nameMain + Constants.JAVA_FILE_EXTENSION);
             listFiles.forEach(f -> {
                 if (nameMain.get().equals(f.getName())) {
                     pathMain.set(f.getPath());
                 }
             });
             //cmd is getting called, java files are compiled and executed
-            String relativePathMain = pathMain.get().replace(path + "\\", "");
+            String relativePathMain = pathMain.get().replace(path + Constants.FILE_SEPARATOR, Constants.EMPTY_STRING);
 
 //            Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"cd " + path +
-//                    "\\" + "output" + "&&" + "javac -cp " + path + "\\" + "output" +
-//                    " " + path + "\\" + "output" + "\\" + relativePathMain +
-//                    "&&" + "java " + relativePathMain + "\"");
+//                    Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR + "&&" + "javac -cp " + path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR +
+//                    Constants.SPACE_STRING + path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR + Constants.FILE_SEPARATOR + relativePathMain +
+//                    "&&" + "java " + relativePathMain + "\Constants.EMPTY_STRING);
 
             ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.directory(new File(path + "\\" + "output"));
-            processBuilder.command("cmd.exe", "/C", "start", "javac", "-cp", path + "\\" + "output", path + "\\" + "output" + "\\" + relativePathMain).start();
+            processBuilder.directory(new File(path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR));
+            processBuilder.command(Constants.CMD, Constants.C, Constants.START, Constants.JAVA_COMPILE, Constants.CP, 
+                    path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR, path + 
+                            Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR + Constants.FILE_SEPARATOR + relativePathMain).start();
             TimeUnit.MILLISECONDS.sleep(1000);
-            processBuilder.command("cmd.exe", "/C", "start", "cmd.exe", "/K", "java", relativePathMain + "\"").start();
+            processBuilder.command(Constants.CMD, Constants.C, Constants.START, Constants.CMD, Constants.K, Constants.JAVA, relativePathMain + "\"").start();
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -822,7 +824,7 @@ public class GridPaneNIO {
      */
     static void findFilesRec(File dir) {
         if (dir.isDirectory()) {
-            if (!dir.getName().equals("output") && !dir.getName().equals(".git")) {
+            if (!dir.getName().equals(Constants.OUTPUT_DIR) && !dir.getName().equals(Constants.GIT_DIR)) {
                 File[] entries = dir.listFiles();
                 if (entries != null) {
                     for (File entry : entries) {
@@ -843,7 +845,7 @@ public class GridPaneNIO {
      */
     private static void findPairs() {
 
-        File[] dir = new File(path + "\\" + "output").listFiles();
+        File[] dir = new File(path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR).listFiles();
         int counter = 0;
 
         if (dir == null)
@@ -854,16 +856,16 @@ public class GridPaneNIO {
             Path tempFile;
 
             for (File f1 : dir) {
-                if (f1.isDirectory() || !f1.getName().contains(".class"))
+                if (f1.isDirectory() || !f1.getName().contains(Constants.CLASS_FILE_EXTENSION))
                     continue;
-                if (f.getName().replaceAll(".java", "").
-                        equals(f1.getName().replaceAll(".class", ""))) {
-                    tempPath = listFiles.get(counter).getPath().replace(path, path + "\\" +
-                            "output");
+                if (f.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING).
+                        equals(f1.getName().replaceAll(Constants.CLASS_FILE_EXTENSION, Constants.EMPTY_STRING))) {
+                    tempPath = listFiles.get(counter).getPath().replace(path, path + Constants.FILE_SEPARATOR +
+                            Constants.OUTPUT_DIR);
                     tempFile = Paths.get(f1.getPath());
                     try {
                         Files.copy(tempFile,
-                                Paths.get(tempPath.replaceAll(".java", ".class")),
+                                Paths.get(tempPath.replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.CLASS_FILE_EXTENSION)),
                                 StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException e) {
                         e.printStackTrace();

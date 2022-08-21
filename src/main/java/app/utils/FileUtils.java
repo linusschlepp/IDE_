@@ -25,9 +25,9 @@ public class FileUtils {
     public static void createFile(String path, String classContent, String className) {
 
         try {
-            if (!Files.exists(Paths.get(path + "\\" + className + ".java")))
-                Files.createFile(Paths.get(path + "\\" + className + ".java"));
-            Files.writeString(Paths.get(path + "\\" + className + ".java"), classContent);
+            if (!Files.exists(Paths.get(path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION)))
+                Files.createFile(Paths.get(path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION));
+            Files.writeString(Paths.get(path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION), classContent);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,23 +41,21 @@ public class FileUtils {
     public static void generateOutputFolder(String path) throws IOException {
 
         //Output-Folder gets deleted before every execution of the program
-        if (Files.exists(Paths.get(path + "\\" + "output")))
-            Files.walk(Paths.get(path + "\\" + "output")).sorted(Comparator.reverseOrder())
+        if (Files.exists(Paths.get(path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR)))
+            Files.walk(Paths.get(path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR)).sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
                     .forEach(File::delete);
 
         try {
             //if the output-folder doesn't exist yet, it is getting created
-            Files.createDirectory(Paths.get(path + "\\" + "output"));
+            Files.createDirectory(Paths.get(path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR));
         }catch(FileAlreadyExistsException ignored){
 
         }
 
 
     }
-
-
-
+    
     /**
      * Copies directories the contents of the source-directory into the directory
      *
@@ -72,7 +70,7 @@ public class FileUtils {
                     Path destination = Paths.get(destinationDirectoryLocation, source.toString()
                             .substring(sourceDirectoryLocation.length()));
                     try {
-                        if (!source.getFileName().toString().equals("output"))
+                        if (!source.getFileName().toString().equals(Constants.OUTPUT_DIR))
                             Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException ignored) {
 
@@ -90,7 +88,7 @@ public class FileUtils {
     public static String getClassContent(File file) {
         StringBuilder sb = new StringBuilder();
         try {
-            Files.lines(Paths.get(String.valueOf(file))).forEach(s -> sb.append(s).append("\n"));
+            Files.lines(Paths.get(String.valueOf(file))).forEach(s -> sb.append(s).append(Constants.NEW_LINE));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -105,10 +103,9 @@ public class FileUtils {
      * @param pathOfFile  the location of the file
      */
     public static void updateFile(String fileContent, String pathOfFile) {
-
-
         Path newPath;
-        newPath = pathOfFile.contains(".java") ? Paths.get(pathOfFile) : Paths.get(pathOfFile + ".java");
+        newPath = pathOfFile.contains(Constants.JAVA_FILE_EXTENSION) ? Paths.get(pathOfFile) : 
+                Paths.get(pathOfFile + Constants.JAVA_FILE_EXTENSION);
         try {
             Files.writeString(newPath, fileContent);
         } catch (Exception ex) {
@@ -130,7 +127,7 @@ public class FileUtils {
 
         try {
             if (!isPackage) {
-                Path newFile = Files.createFile(Paths.get(path + packageName + className + ".java"));
+                Path newFile = Files.createFile(Paths.get(path + packageName + className + Constants.JAVA_FILE_EXTENSION));
                 Files.writeString(newFile, classContent);
             } else {
                 if (!Files.exists(Paths.get(path + packageName + className)))
@@ -152,11 +149,11 @@ public class FileUtils {
         try {
             String fileContent = Files.lines(Paths.get(entry.getPath())).collect(Collectors.toList()).toString();
 
-            if (fileContent.contains("class"))
+            if (fileContent.contains(Constants.CLASS_STRING))
                 return CLASS;
-            if (fileContent.contains("enum"))
+            if (fileContent.contains(Constants.ENUM_STRING))
                 return ENUM;
-            if (fileContent.contains("interface"))
+            if (fileContent.contains(Constants.INTERFACE_STRING))
                 return INTERFACE;
 
         } catch (IOException e) {
@@ -184,7 +181,7 @@ public class FileUtils {
             e.printStackTrace();
         }
 
-        return "";
+        return Constants.EMPTY_STRING;
     }
 
 

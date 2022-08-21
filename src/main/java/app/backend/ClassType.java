@@ -1,6 +1,7 @@
 package app.backend;
 
 import app.frontend.GridPaneNIO;
+import app.utils.Constants;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.Objects;
@@ -15,7 +16,7 @@ public enum ClassType {
     PACKAGE {
         @Override
         public String getClassType() {
-            return "package";
+            return Constants.PACKAGE_STRING;
         }
         @Override
         public ImageView getImage() {
@@ -25,7 +26,7 @@ public enum ClassType {
     CLASS{
         @Override
         public String getClassType() {
-            return "class";
+            return Constants.CLASS_STRING;
         }
         @Override
         public ImageView getImage() {
@@ -35,7 +36,7 @@ public enum ClassType {
     ENUM{
         @Override
         public String getClassType() {
-            return "enum";
+            return Constants.ENUM_STRING;
         }
 
         @Override
@@ -46,7 +47,7 @@ public enum ClassType {
     INTERFACE{
         @Override
         public String getClassType() {
-            return "interface";
+            return Constants.INTERFACE_STRING;
         }
 
         @Override
@@ -58,7 +59,7 @@ public enum ClassType {
 
         @Override
         public String getClassType(){
-            return "project";
+            return Constants.PROJECT_STRING;
         }
 
         @Override
