@@ -73,7 +73,7 @@ public class GitUtils {
      * @throws IOException if error occurs
      */
     public static void gitLog(String path) throws IOException {
-        // ToDo: Implement method returning bufferedreader
+        // ToDo: Implement method returning bufferedReader
         BufferedReader br = new BufferedReader(new InputStreamReader(new ProcessBuilder().directory(new File(path))
                 .command("cmd.exe", "/C", "start", "git", "log")
                 .start().getInputStream()));
