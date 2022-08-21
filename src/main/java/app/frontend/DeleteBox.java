@@ -2,6 +2,7 @@ package app.frontend;
 
 import app.backend.ClassType;
 import app.backend.CustomItem;
+import app.utils.Constants;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -24,11 +25,11 @@ public class DeleteBox {
     public static void display(TreeItem<CustomItem> treeItem) {
 
         Stage window = new Stage();
-        window.setTitle("Delete " + treeItem.getValue().getLabelText());
+        window.setTitle(Constants.DELETE + Constants.EMPTY_STRING + treeItem.getValue().getLabelText());
         GridPane grdPane = new GridPane();
         grdPane.setPadding(new Insets(8, 8, 8, 8));
-        Label label = new Label("Are you sure that you want to delete: " + treeItem.getValue().getLabelText());
-        Button button = new Button("Ok");
+        Label label = new Label(Constants.SURE_DELETE+ Constants.EMPTY_STRING + treeItem.getValue().getLabelText());
+        Button button = new Button(Constants.OK);
         GridPane.setConstraints(label, 0, 0);
         GridPane.setConstraints(button, 0, 5);
         grdPane.getChildren().addAll(label, button);
@@ -44,8 +45,8 @@ public class DeleteBox {
                             .forEach(File::delete);
                 } else {
                     String tempPath = treeItem.getValue().getPath();
-                    if (!tempPath.contains(".java"))
-                        tempPath += ".java";
+                    if (!tempPath.contains(Constants.JAVA_FILE_EXTENSION))
+                        tempPath += Constants.JAVA_FILE_EXTENSION;
 
                     if (Files.deleteIfExists(Paths.get(tempPath)))
                         Files.delete(Paths.get(tempPath));

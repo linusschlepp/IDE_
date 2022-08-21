@@ -2,6 +2,7 @@ package app.frontend;
 
 import app.backend.ClassType;
 import app.backend.CustomItem;
+import app.utils.Constants;
 import app.utils.FileUtils;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -27,7 +28,7 @@ public class RenameBox {
         TextField textField = new TextField("Enter new name of " + treeItem.getValue().getClassType());
         textField.setPrefWidth(300);
         textField.setMaxWidth(300);
-        Button button = new Button("Ok");
+        Button button = new Button(Constants.OK);
         GridPane.setConstraints(label, 0, 0);
         GridPane.setConstraints(textField, 0, 2);
         GridPane.setConstraints(button, 0, 5);
@@ -57,12 +58,12 @@ public class RenameBox {
                 //if the required TreeItem is of classType enum, interface or class
                 else {
                     String oldName = treeItem.getValue().getLabelText();
-                    Path source = Paths.get(treeItem.getValue().getPath().contains(".java") ? treeItem.getValue().getPath() : treeItem.getValue().getPath() + ".java");
+                    Path source = Paths.get(treeItem.getValue().getPath().contains(Constants.JAVA_FILE_EXTENSION) ? treeItem.getValue().getPath() : treeItem.getValue().getPath() + Constants.JAVA_FILE_EXTENSION);
                     //path of treeItem is getting changed to new name
                     treeItem.getValue().setPath(treeItem.getValue().getPath()
                             .replaceAll(oldName, textField.getText()));
                     treeItem.getValue().setBoxText(textField.getText());
-                    Files.move(source, source.resolveSibling(textField.getText() + ".java"));
+                    Files.move(source, source.resolveSibling(textField.getText() + Constants.JAVA_FILE_EXTENSION));
                     changeClassContent(treeItem, textField.getText(), oldName);
                 }
             } catch (IOException ex) {
@@ -110,11 +111,6 @@ public class RenameBox {
             else
                 changeClassContentRec(t.getChildren(), newName, oldName);
         });
-
-
-
-
-
     }
 
 }

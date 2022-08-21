@@ -1,6 +1,7 @@
 package app.frontend;
 import app.backend.ClassType;
 import app.backend.CustomItem;
+import app.utils.Constants;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,7 +18,7 @@ import static app.backend.ClassType.*;
 
 /**
  * Gets displayed, if new classes/ packages are added to the TreeView
- * Enables user to select name location of the file (package-hierachy)
+ * Enables user to select name location of the file (package-hierarchy)
  */
 public class ClassBox {
 
@@ -30,19 +31,19 @@ public class ClassBox {
 
         if (!GridPaneNIO.path.isEmpty()) {
 
-            CheckBox checkBox = new CheckBox("is Main?");
+            CheckBox checkBox = new CheckBox(Constants.IS_MAIN);
 
             GridPane grdPane = new GridPane();
             grdPane.setPadding(new Insets(8, 8, 8, 8));
             grdPane.setVgap(8);
             grdPane.setHgap(10);
             Stage window = new Stage();
-            window.setTitle("Add Class");
-            Label label = new Label("Enter the name of the " + classKind.getClassType());
+            window.setTitle(Constants.ADD + Constants.SPACE_STRING + classKind.getClassType());
+            Label label = new Label(Constants.ENTER_NAME +Constants.SPACE_STRING + classKind.getClassType());
             TextField textField = new TextField();
             textField.setPrefWidth(150);
             textField.setMaxWidth(150);
-            Button button = new Button("Ok");
+            Button button = new Button(Constants.OK);
             GridPane.setConstraints(label, 0, 0);
             GridPane.setConstraints(textField, 0, 1);
             if (classKind.equals(CLASS)) {
@@ -60,13 +61,14 @@ public class ClassBox {
                 comboBox.setValue(defaultValue);
                 for (String s : GridPaneNIO.packageNameHashMap.keySet())
                     comboBox.getItems().add(s);
-                Label labelPackage = new Label("Add class to specific package:");
+                Label labelPackage = new Label(Constants.ADD+Constants.SPACE_STRING+classKind.getClassType()+
+                        Constants.SPACE_STRING+Constants.SPECIFIC_PACKAGE);
                 GridPane.setConstraints(labelPackage, 0, 3);
                 GridPane.setConstraints(comboBox, 0, 4);
                 GridPane.setConstraints(button, 0, 5);
                 grdPane.getChildren().addAll(label, textField, labelPackage, comboBox, button);
             }
-            comboBox.getItems().add("");
+            comboBox.getItems().add(Constants.EMPTY_STRING);
             window.setScene(new Scene(grdPane, 200, 200));
             window.show();
 
@@ -80,24 +82,24 @@ public class ClassBox {
 
                         GridPaneNIO.addToPackage(selectedValue, textField.getText(), classKind,
                                 new File(GridPaneNIO.path + GridPaneNIO.getCorrectPath(Objects
-                                        .requireNonNull(getRequiredTreeItem(selectedValue)))+"\\"+selectedValue));
+                                        .requireNonNull(getRequiredTreeItem(selectedValue)))+ Constants.FILE_SEPARATOR+selectedValue));
                     else if (!isPackage)
                         //if isPackage is false, we just add a Class to the filesystem as well as to the TreeView
                         GridPaneNIO.addClass(textField.getText(), classKind);
                     else
                         // if is Package is true, we add a Package to the filesystem as well as to the TreeView
-                        GridPaneNIO.addPackage(textField.getText(), new File(GridPaneNIO.path + "\\" + textField.getText()));
+                        GridPaneNIO.addPackage(textField.getText(), new File(GridPaneNIO.path +
+                                Constants.FILE_SEPARATOR + textField.getText()));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
 
                 window.close();
-                defaultValue = "";
+                defaultValue = Constants.EMPTY_STRING;
             });
             //if the path is empty the AlertBox will be displayed
         } else
-            AlertBox.display(Alert.AlertType.WARNING, "Create project first");
-
+            AlertBox.display(Alert.AlertType.WARNING, Constants.CREATE_PROJECT);
     }
 
 
