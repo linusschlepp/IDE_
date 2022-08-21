@@ -27,13 +27,13 @@ import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.*;
-import java.net.URISyntaxException;
+
 import java.nio.file.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
+
 
 import static app.backend.ClassType.*;
 
@@ -45,7 +45,7 @@ public class GridPaneNIO {
     TreeItem<CustomItem> retTreeItem;
     static StringBuilder sb = new StringBuilder();
     static TextFlow textFlow = new TextFlow();
-    static String path = "";
+    public static String path = "";
     static HashMap<String, TreeItem<CustomItem>> packageNameHashMap = new HashMap<>();
     static HashMap<TextArea, String> textAreaStringHashMap = new HashMap<>();
     static TreeView<CustomItem> treeView = new TreeView<>();
@@ -62,6 +62,7 @@ public class GridPaneNIO {
     MenuItem menuItemSelectProject = new MenuItem("Select Project");
     MenuItem menuItemDelete = new MenuItem("Delete");
     MenuItem menuItemRename = new MenuItem("Rename");
+    MenuItem menutItemAddGit = new MenuItem("Add");
     Menu menuGit = new Menu();
     MenuItem menuItemInit = new MenuItem("Create Repository");
     MenuItem menuItemCommit = new Menu("Create Commit");
@@ -95,7 +96,7 @@ public class GridPaneNIO {
     /**
      * Creates the Stage as well as the layout
      */
-    public void start() {
+    public void init() {
 
 
         menuExecute.getItems().add(menuItemExec1);
@@ -109,6 +110,11 @@ public class GridPaneNIO {
         menuExecute.setGraphic(viewMenu);
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
+
+        ImageView viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/greenPlay.png"))));
+        menuItemExec1.setGraphic(viewMenuItem);
+        viewMenuItem.setFitHeight(20);
+        viewMenuItem.setPreserveRatio(true);
         menuItemExec1.setAccelerator(KeyCombination.keyCombination("Ctrl+R"));
         menuItemExec1.setOnAction(e -> execute());
 
@@ -119,11 +125,10 @@ public class GridPaneNIO {
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
 
-        ImageView viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/renameIcon.png"))));
+        viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/renameIcon.png"))));
         menuItemRename.setGraphic(viewMenuItem);
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
-
         menuItemRename.setOnAction(e -> RenameBox.display(getRetTreeItem()));
 
 
@@ -132,39 +137,45 @@ public class GridPaneNIO {
         menuItemDelete.setOnAction(e -> DeleteBox.display(getRetTreeItem()));
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
-        viewMenuItem = CLASS.getImage();
 
 
         viewMenu = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/plusIcon.png"))));
+        menuAdd.setGraphic(viewMenu);
+        viewMenu.setFitHeight(20);
+        viewMenu.setPreserveRatio(true);
+
+        viewMenuItem = CLASS.getImage();
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
-        menuAdd.setGraphic(viewMenu);
         menuItemAddClass.setAccelerator(KeyCombination.keyCombination("Ctrl+K"));
         menuItemAddClass.setOnAction(e -> ClassBox.display(CLASS, false));
         menuItemAddClass.setGraphic(viewMenuItem);
+
         viewMenuItem = INTERFACE.getImage();
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         menuItemAddInterface.setAccelerator(KeyCombination.keyCombination("Ctrl+I"));
         menuItemAddInterface.setGraphic(viewMenuItem);
         menuItemAddInterface.setOnAction(e -> ClassBox.display(INTERFACE, false));
+
+
+        label = new Label();
+        contextMenuPackages = new ContextMenu();
+        contextMenuClasses = new ContextMenu();
+
         viewMenuItem = ENUM.getImage();
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
-        contextMenuPackages = new ContextMenu();
-        contextMenuClasses = new ContextMenu();
         menuItemAddEnum.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
         menuItemAddEnum.setGraphic(viewMenuItem);
         menuItemAddEnum.setOnAction(e -> ClassBox.display(ENUM, false));
+
         viewMenuItem = PACKAGE.getImage();
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         menuItemAddPackage.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
         menuItemAddPackage.setGraphic(viewMenuItem);
         menuItemAddPackage.setOnAction(e -> ClassBox.display(PACKAGE, true));
-        viewMenu.setFitHeight(20);
-        label = new Label();
-        viewMenu.setPreserveRatio(true);
 
 
         viewMenuItem = PROJECT.getImage();
@@ -193,7 +204,19 @@ public class GridPaneNIO {
         menuItemCommit.setGraphic(viewMenuItem);
         menuItemCommit.setOnAction(e -> {
             CommitBox.display(path);
-            // GitUtils.gitCommit(path);
+        });
+
+        // TODO: Find out, why this image is not added!
+        viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/plusIcon.png"))));
+        viewMenuItem.setFitHeight(20);
+        viewMenuItem.setPreserveRatio(true);
+        menutItemAddGit.setGraphic(viewMenuItem);
+        menutItemAddGit.setOnAction(e -> {
+            try {
+                GitUtils.gitAdd(getRetTreeItem());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
         });
 
 
@@ -220,6 +243,12 @@ public class GridPaneNIO {
         GridPane.setRowSpan(label, 1);
         gridPane.add(textArea, 1, 2);
         Scene scene = new Scene(gridPane, 800, 800);
+
+
+        viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/selectProjectIcon.png"))));
+        viewMenuItem.setFitHeight(20);
+        viewMenuItem.setPreserveRatio(true);
+        menuItemSelectProject.setGraphic(viewMenuItem);
         menuItemSelectProject.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         menuItemSelectProject.setOnAction(e -> {
             try {
@@ -229,22 +258,18 @@ public class GridPaneNIO {
             }
         });
 
-        viewMenuItem = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/selectProjectIcon.png"))));
-        viewMenuItem.setFitHeight(20);
-        viewMenuItem.setPreserveRatio(true);
-        menuItemSelectProject.setGraphic(viewMenuItem);
+
+
         //items get added to contextMenuPackages
-
-
         AtomicReference<TreeItem<CustomItem>> tempTreeItem = new AtomicReference<>();
         treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             //to avoid the addition of too many menuItems within the contextMenu
             if (contextMenuPackages.getItems().isEmpty() && contextMenuClasses.getItems().isEmpty()) {
                 //menuItems get added to contextMenuPackages
                 contextMenuPackages.getItems().addAll(CopyUtils.copyMenuItem(menuItemAddClass), CopyUtils.copyMenuItem(menuItemAddInterface), CopyUtils.copyMenuItem(menuItemAddEnum),
-                        CopyUtils.copyMenuItem(menuItemAddPackage), CopyUtils.copyMenuItem(menuItemRename), CopyUtils.copyMenuItem(menuItemDelete));
+                        CopyUtils.copyMenuItem(menuItemAddPackage), CopyUtils.copyMenuItem(menuItemRename), CopyUtils.copyMenuItem(menuItemDelete), CopyUtils.copyMenuItem(menutItemAddGit));
                 //menuItems get added to contextMenuClasses
-                contextMenuClasses.getItems().addAll(CopyUtils.copyMenuItem(menuItemRename), CopyUtils.copyMenuItem(menuItemDelete));
+                contextMenuClasses.getItems().addAll(CopyUtils.copyMenuItem(menuItemRename), CopyUtils.copyMenuItem(menuItemDelete), CopyUtils.copyMenuItem(menutItemAddGit));
             }
             if (newValue != null) {
                 tempTreeItem.set(newValue);
@@ -291,7 +316,7 @@ public class GridPaneNIO {
     /**
      * Helper-method which copies ImageViews for the label
      *
-     * @param treeItem represents treeItem, which image is getting copied
+     * @param treeItem treeItem, which image is getting copied
      */
     private static void setImageLabel(TreeItem<CustomItem> treeItem) {
 
@@ -454,7 +479,6 @@ public class GridPaneNIO {
                                 addToPackage(new File(entry.getParent()).getName(), entry.getPath(),
                                         entry.getName().replaceAll(".java", ""), FileUtils.checkForClassType(entry), entry);
                         }
-
                         if (entry.isDirectory())
                             recreateRecProject(entry);
                     }
@@ -860,4 +884,6 @@ public class GridPaneNIO {
     public void setRetTreeItem(TreeItem<CustomItem> retTreeItem) {
         this.retTreeItem = retTreeItem;
     }
+
+
 }
