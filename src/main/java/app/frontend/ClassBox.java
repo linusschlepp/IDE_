@@ -7,6 +7,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,6 +27,8 @@ public class ClassBox {
     static String defaultValue;
     static boolean isSelected = false;
     static ComboBox<String> comboBox = new ComboBox<>();
+    public static Logger LOG = LoggerFactory.getLogger(DeleteBox.class);
+
 
     public static void display(ClassType classKind, boolean isPackage) {
 
@@ -91,7 +95,8 @@ public class ClassBox {
                         GridPaneNIO.addPackage(textField.getText(), new File(GridPaneNIO.path +
                                 Constants.FILE_SEPARATOR + textField.getText()));
                 } catch (IOException ex) {
-                    ex.printStackTrace();
+                    LOG.error("[{}] [{}] could not be added", classKind.getClassType(),
+                            selectedValue);
                 }
 
                 window.close();
