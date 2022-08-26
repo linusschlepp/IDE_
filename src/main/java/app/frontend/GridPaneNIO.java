@@ -34,13 +34,16 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-import static app.backend.ClassType.*;
 
 
 public class GridPaneNIO {
 
+
+    public static Logger LOG = LoggerFactory.getLogger(GridPaneNIO.class);
     static Stage primaryStage;
     static Label label;
     TreeItem<CustomItem> retTreeItem;
@@ -99,7 +102,7 @@ public class GridPaneNIO {
      */
     public void init() {
 
-
+        LOG.info("Starting to build stage...");
         menuExecute.getItems().add(menuItemExec1);
         menuAdd.getItems().addAll(menuItemAddClass, menuItemAddInterface, menuItemAddEnum, menuItemAddPackage, menuItemAddProject, menuItemSelectProject);
         menuClose.getItems().add(menuItemClose1);
@@ -145,41 +148,41 @@ public class GridPaneNIO {
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
 
-        viewMenuItem = CLASS.getImage();
+        viewMenuItem = ClassType.CLASS.getImage();
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         menuItemAddClass.setAccelerator(KeyCombination.keyCombination("Ctrl+K"));
-        menuItemAddClass.setOnAction(e -> ClassBox.display(CLASS, false));
+        menuItemAddClass.setOnAction(e -> ClassBox.display(ClassType.CLASS, false));
         menuItemAddClass.setGraphic(viewMenuItem);
 
-        viewMenuItem = INTERFACE.getImage();
+        viewMenuItem = ClassType.INTERFACE.getImage();
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         menuItemAddInterface.setAccelerator(KeyCombination.keyCombination("Ctrl+I"));
         menuItemAddInterface.setGraphic(viewMenuItem);
-        menuItemAddInterface.setOnAction(e -> ClassBox.display(INTERFACE, false));
+        menuItemAddInterface.setOnAction(e -> ClassBox.display(ClassType.INTERFACE, false));
 
 
         label = new Label();
         contextMenuPackages = new ContextMenu();
         contextMenuClasses = new ContextMenu();
 
-        viewMenuItem = ENUM.getImage();
+        viewMenuItem = ClassType.ENUM.getImage();
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         menuItemAddEnum.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
         menuItemAddEnum.setGraphic(viewMenuItem);
-        menuItemAddEnum.setOnAction(e -> ClassBox.display(ENUM, false));
+        menuItemAddEnum.setOnAction(e -> ClassBox.display(ClassType.ENUM, false));
 
-        viewMenuItem = PACKAGE.getImage();
+        viewMenuItem = ClassType.PACKAGE.getImage();
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         menuItemAddPackage.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
         menuItemAddPackage.setGraphic(viewMenuItem);
-        menuItemAddPackage.setOnAction(e -> ClassBox.display(PACKAGE, true));
+        menuItemAddPackage.setOnAction(e -> ClassBox.display(ClassType.PACKAGE, true));
 
 
-        viewMenuItem = PROJECT.getImage();
+        viewMenuItem = ClassType.PROJECT.getImage();
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         menuItemAddProject.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
@@ -281,10 +284,10 @@ public class GridPaneNIO {
                 //if TreeItem corresponds to project or package
 
                 setRetTreeItem(tempTreeItem.get());
-                if (tempTreeItem.get().getValue().getClassType().equals(PACKAGE) ||
-                        tempTreeItem.get().getValue().getClassType().equals(PROJECT)) {
+                if (tempTreeItem.get().getValue().getClassType().equals(ClassType.PACKAGE) ||
+                        tempTreeItem.get().getValue().getClassType().equals(ClassType.PROJECT)) {
                     contextMenuPackages.show(tempTreeItem.get().getValue(), e.getScreenX(), e.getScreenY());
-                    if (tempTreeItem.get().getValue().getClassType().equals(PACKAGE))
+                    if (tempTreeItem.get().getValue().getClassType().equals(ClassType.PACKAGE))
                         ClassBox.defaultValue = tempTreeItem.get().getValue().getLabelText();
                 }
                 // if TreeItem corresponds to class
@@ -310,7 +313,7 @@ public class GridPaneNIO {
 
         primaryStage.setScene(scene);
         primaryStage.show();
-
+        LOG.info("Successfully built stage");
     }
 
     /**
@@ -322,11 +325,11 @@ public class GridPaneNIO {
 
         ImageView imageView;
 
-        if (treeItem.getValue().getClassType().equals(PACKAGE))
+        if (treeItem.getValue().getClassType().equals(ClassType.PACKAGE))
             imageView = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/packageIcon.png"))));
-        else if (treeItem.getValue().getClassType().equals(CLASS))
+        else if (treeItem.getValue().getClassType().equals(ClassType.CLASS))
             imageView = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/classIcon.png"))));
-        else if (treeItem.getValue().getClassType().equals(INTERFACE))
+        else if (treeItem.getValue().getClassType().equals(ClassType.INTERFACE))
             imageView = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/interfaceIcon.png"))));
         else
             imageView = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/enumIcon.png"))));
@@ -358,7 +361,7 @@ public class GridPaneNIO {
                     Constants.PROJECT_FILES + Constants.FILE_SEPARATOR + Constants.CURRENT_PROJECT)), path);
 
 
-            //textArea gets reseted after selection
+            //textArea gets resetted after selection
             textArea.setText(Constants.EMPTY_STRING);
         } catch (Exception e) {
             e.printStackTrace();
@@ -376,7 +379,7 @@ public class GridPaneNIO {
 
         textFlow.getChildren().addAll(projectText, pathText);
         gridPane.getChildren().add(textFlow);
-        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(fileName), PROJECT, path));
+        TreeItemProject = new TreeItem<>(new CustomItem(ClassType.PROJECT.getImage(), new Label(fileName), ClassType.PROJECT, path));
         treeView.setRoot(TreeItemProject);
         recreateRecProject(new File(path));
 
@@ -411,8 +414,8 @@ public class GridPaneNIO {
             classKind, File file) {
 
         TreeItem<CustomItem> treeItem;
-        if (classKind.equals(PACKAGE)) {
-            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), PACKAGE, file.getPath()));
+        if (classKind.equals(ClassType.PACKAGE)) {
+            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), ClassType.PACKAGE, file.getPath()));
             packageNameHashMap.put(className, treeItem);
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
         } else {
@@ -434,7 +437,8 @@ public class GridPaneNIO {
      */
     public static void addPackage1(String packageName, File file) {
 
-        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(PACKAGE.getImage(), new Label(packageName), PACKAGE, file.getPath()));
+        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(ClassType.PACKAGE.getImage(), new Label(packageName),
+                ClassType.PACKAGE, file.getPath()));
         packageNameHashMap.put(packageName, treeItem);
         TreeItemProject.getChildren().add(treeItem);
 
@@ -445,10 +449,13 @@ public class GridPaneNIO {
      */
     private static void recreateProject() {
         //if the project exists it gets added and recreated
+        LOG.info("Starting to recreate project...");
         if (getProjectPath() != null) {
             addProject(getProjectPath());
             recreateRecProject(getProjectPath());
         }
+
+        LOG.info("Successfully recreated project");
 
     }
 
@@ -472,7 +479,7 @@ public class GridPaneNIO {
                         } else {
                             if (entry.isDirectory() && !entry.getName().equals(Constants.OUTPUT_DIR) && !entry.getName().equals(Constants.GIT_DIR))
                                 addToPackage(new File(entry.getParent()).getName(),
-                                        entry.getPath(), entry.getName(), PACKAGE, entry);
+                                        entry.getPath(), entry.getName(), ClassType.PACKAGE, entry);
                             else
                                 addToPackage(new File(entry.getParent()).getName(), entry.getPath(),
                                         entry.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING), 
@@ -558,6 +565,8 @@ public class GridPaneNIO {
     private static void addProject() throws IOException {
 
 
+        LOG.info("Open FileDialog and adding project");
+
         textAreaStringHashMap = new HashMap<>();
         packageNameHashMap = new HashMap<>();
         listFiles.clear();
@@ -579,8 +588,11 @@ public class GridPaneNIO {
         pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
 
         textFlow.getChildren().addAll(projectText, pathText);
-        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(fileName), PROJECT, path));
+        TreeItemProject = new TreeItem<>(new CustomItem(ClassType.PROJECT.getImage(), new Label(fileName),
+                ClassType.PROJECT, path));
         treeView.setRoot(TreeItemProject);
+
+        LOG.info("Successfully added project");
     }
 
     /**
@@ -589,6 +601,8 @@ public class GridPaneNIO {
      * @param currentPath path, of the project, which is getting recreated in the TreeView
      */
     private static void addProject(File currentPath) {
+
+        LOG.info("Adding project to stage...");
         path = currentPath.getPath();
         fileName = currentPath.getName();
         textFlow = new TextFlow();
@@ -601,9 +615,11 @@ public class GridPaneNIO {
 
 
         textFlow.getChildren().addAll(projectText, pathText);
-        TreeItemProject = new TreeItem<>(new CustomItem(PROJECT.getImage(), new Label(currentPath.getName()), PROJECT, path));
+        TreeItemProject = new TreeItem<>(new CustomItem(ClassType.PROJECT.getImage(), new Label(currentPath.getName()),
+                ClassType.PROJECT, path));
         treeView.setRoot(TreeItemProject);
 
+        LOG.info("Successfully added project to stage");
     }
 
     /**
@@ -625,6 +641,7 @@ public class GridPaneNIO {
      */
     public static void addClass(String className, ClassType classKind) {
 
+        LOG.info("Adding class: [{}]", className);
 
         TextArea tArea = new TextArea(getClassContent(className, classKind.getClassType()));
 //        tArea.textProperty().addListener((ObservableValue<? extends String> o, String oldValue, String newValue) ->
@@ -643,6 +660,8 @@ public class GridPaneNIO {
         TreeItemProject.getChildren().add(treeItem);
         textAreaStringHashMap.put(tArea, className);
         FileUtils.createFile(path, tArea.getText(), className);
+
+        LOG.info("Successfully added class: [{}]", className);
     }
 
     /**
@@ -653,11 +672,16 @@ public class GridPaneNIO {
      */
     public static void addPackage(String packageName, File file) throws IOException {
 
-        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(PACKAGE.getImage(), new Label(packageName), PACKAGE, file.getPath()));
+        LOG.info("Adding package: [{}]", packageName);
+
+        TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(ClassType.PACKAGE.getImage(),
+                new Label(packageName), ClassType.PACKAGE, file.getPath()));
         packageNameHashMap.put(packageName, treeItem);
         if (!Files.exists(Paths.get(path + Constants.FILE_SEPARATOR + packageName)))
             Files.createDirectory(Paths.get(path + Constants.FILE_SEPARATOR + packageName));
         TreeItemProject.getChildren().add(treeItem);
+
+        LOG.info("Successfully added package: [{}]", packageName);
 
     }
 
@@ -673,10 +697,12 @@ public class GridPaneNIO {
     public static void addToPackage(String packageName, String className, ClassType classKind, File file) throws
             FileNotFoundException {
 
+        LOG.info("Adding class: [{}] to package: [{}]", className, packageName);
+
         TreeItem<CustomItem> treeItem;
 
-        if (classKind.equals(PACKAGE)) {
-            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), PACKAGE, file.getPath()));
+        if (classKind.equals(ClassType.PACKAGE)) {
+            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), ClassType.PACKAGE, file.getPath()));
             packageNameHashMap.put(className, treeItem);
             packageNameHashMap.get(packageName).getChildren().add(treeItem);
 
@@ -693,10 +719,12 @@ public class GridPaneNIO {
             FileUtils.createFile(path, tArea.getText(), getCorrectPath(treeItem), className, false);
 
         }
+
+        LOG.info("Successfully added class: [{}] to package: [{}]", className, packageName);
     }
 
     /**
-     * Adds the class headers to the individual TextAreas e.g. package1.package2 by analyzing the filestructures of the files;
+     * Adds the class headers to the individual TextAreas e.g. package1.package2 by analyzing the file-structures of the files;
      *
      * @param packageName name of the packages which are getting added
      * @param className   name of the class/enum or interface
@@ -704,10 +732,15 @@ public class GridPaneNIO {
      * @return instance of TextArea with corresponding content
      */
     private static TextArea generateTextAreaContent(String packageName, String className, ClassType classKind) {
+
+        LOG.info("Creating file-content of: [{}]", className);
+
         TreeItem<CustomItem> dummyItem = new TreeItem<>();
         packageNameHashMap.get(packageName).getChildren().add(dummyItem);
         getCorrectPath(dummyItem);
         packageNameHashMap.get(packageName).getChildren().remove(dummyItem);
+
+        LOG.info("Successfully created file-content of: [{}]", className);
 
         return new TextArea(getClassContent(className, classKind.getClassType()));
     }
@@ -716,6 +749,8 @@ public class GridPaneNIO {
      * Gets right path of packages
      */
     public static String getCorrectPath(TreeItem<CustomItem> treeItem) {
+
+        LOG.info("Creating correct path...");
         StringBuilder stringBuilder = new StringBuilder();
         List<String> stringList = new ArrayList<>();
         sb.setLength(0);
@@ -743,6 +778,8 @@ public class GridPaneNIO {
 
 
         sb.append(Constants.SEMI_COLON).append(Constants.DOUBLE_NEW_LINE);
+
+        LOG.info("Successfully created path");
 
 
         return stringBuilder.toString().contains(fileName) ? stringBuilder.toString().replaceAll(fileName, Constants.EMPTY_STRING) :
@@ -776,6 +813,8 @@ public class GridPaneNIO {
      * Opens cmd, compiles each file and runs them
      */
     public void execute() {
+
+        LOG.info("Trying to execute code...");
 
         listFiles = new ArrayList<>();
         try {
@@ -815,6 +854,8 @@ public class GridPaneNIO {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        LOG.info("Successfully executed code");
     }
 
     /**
@@ -844,6 +885,8 @@ public class GridPaneNIO {
      * Pairs of .java and .class files are getting found and created
      */
     private static void findPairs() {
+
+        LOG.info(String.format("Creating pairs for %s and %s-files...", Constants.CLASS_FILE_EXTENSION, Constants.JAVA_FILE_EXTENSION));
 
         File[] dir = new File(path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR).listFiles();
         int counter = 0;
@@ -875,6 +918,8 @@ public class GridPaneNIO {
             }
             counter++;
         }
+
+        LOG.info(String.format("Successfully created pairs for %s and %s-files...", Constants.CLASS_FILE_EXTENSION, Constants.JAVA_FILE_EXTENSION));
 
     }
 

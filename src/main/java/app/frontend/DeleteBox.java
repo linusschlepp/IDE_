@@ -10,6 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +22,9 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 
 public class DeleteBox {
+
+
+    public static Logger LOG = LoggerFactory.getLogger(DeleteBox.class);
 
 
     public static void display(TreeItem<CustomItem> treeItem) {
@@ -38,6 +43,9 @@ public class DeleteBox {
 
         button.setOnAction(e -> {
 
+            LOG.info("Deleting [{}] [{}]", treeItem.getValue().getClassType(),
+                    treeItem.getValue().getBoxText().getText());
+
             try {
                 if (treeItem.getValue().getClassType().equals(ClassType.PACKAGE)) {
                     Files.walk(Paths.get(treeItem.getValue().getPath())).sorted(Comparator.reverseOrder())
@@ -50,19 +58,19 @@ public class DeleteBox {
 
                     if (Files.deleteIfExists(Paths.get(tempPath)))
                         Files.delete(Paths.get(tempPath));
-
                 }
-
-
             } catch (IOException ex) {
                 if (!(ex instanceof NoSuchFileException))
-                    ex.printStackTrace();
+                    LOG.error("[{}] [{}] could not be deleted, because it does not exist", treeItem.getValue().getClassType(),
+                            treeItem.getValue().getBoxText().getText());
             } finally {
                 treeItem.getParent().getChildren().remove(treeItem);
             }
             window.close();
         });
 
+        LOG.info("Successfully deleted [{}] [{}]", treeItem.getValue().getClassType(),
+                treeItem.getValue().getBoxText().getText());
 
     }
 }
