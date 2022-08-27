@@ -9,14 +9,19 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+
 
 /**
  * Gets displayed, if the user wants to commit
  */
 public class CommitBox {
 
+
+    private final static Logger LOG = LoggerFactory.getLogger(CommitBox.class);
 
     public static void display() {
 
@@ -41,7 +46,7 @@ public class CommitBox {
             try {
                 GitUtils.gitCommit(textField.getText());
             } catch (IOException ex) {
-                ex.printStackTrace();
+                LOG.error("Commit was not possible");
             }
             window.close();
 
