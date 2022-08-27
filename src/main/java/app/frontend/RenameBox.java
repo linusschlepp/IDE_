@@ -10,12 +10,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.*;
 
 
 public class RenameBox {
+
+
+    private final static Logger LOG = LoggerFactory.getLogger(RenameBox.class);
 
     public static void display(TreeItem<CustomItem> treeItem) {
 
@@ -67,11 +72,13 @@ public class RenameBox {
                     changeClassContent(treeItem, textField.getText(), oldName);
                 }
             } catch (IOException ex) {
-                if (ex instanceof FileAlreadyExistsException)
+                if (ex instanceof FileAlreadyExistsException) {
                     AlertBox.display(Alert.AlertType.WARNING, "A file with the name: " + textField.getText() +
                             " already exists, please choose a different name");
-                else
-                    ex.printStackTrace();
+                    LOG.error("File could not be renamed, a file with the name: [{}], does already exist", textField.getText());
+                }else
+                    LOG.error("[{}], [{}] could not be renamed", treeItem.getValue().getClassType().getClassType(),
+                            treeItem.getValue().getBoxText().getText());
             } finally {
                 window.close();
             }

@@ -2,6 +2,8 @@ package app.utils;
 
 import app.backend.ClassType;
 import app.frontend.GridPaneNIO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +18,8 @@ import static app.backend.ClassType.CLASS;
 public class FileUtils {
 
 
+    private static final Logger LOG  = LoggerFactory.getLogger(FileUtils.class);
+
     /**
      * Creates files in the requested locations
      *
@@ -29,7 +33,7 @@ public class FileUtils {
                 Files.createFile(Paths.get(path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION));
             Files.writeString(Paths.get(path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION), classContent);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("File: [{}] in [{}] could not be created", className, path);
         }
     }
 
@@ -49,8 +53,8 @@ public class FileUtils {
         try {
             //if the output-folder doesn't exist yet, it is getting created
             Files.createDirectory(Paths.get(path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR));
-        }catch(FileAlreadyExistsException ignored){
-
+        }catch(FileAlreadyExistsException e){
+            LOG.error("File in path: [{}] already exists and could therefore not be created", path);
         }
 
 
@@ -72,8 +76,8 @@ public class FileUtils {
                     try {
                         if (!source.getFileName().toString().equals(Constants.OUTPUT_DIR))
                             Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
-                    } catch (IOException ignored) {
-
+                    } catch (IOException e) {
+                        LOG.error("Directory: [{}] could not be copied into: [{}]", sourceDirectoryLocation, destinationDirectoryLocation);
                     }
                 });
     }
@@ -90,7 +94,7 @@ public class FileUtils {
         try {
             Files.lines(Paths.get(String.valueOf(file))).forEach(s -> sb.append(s).append(Constants.NEW_LINE));
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("File: [{}] could not be read", file.getPath());
         }
         return sb.toString();
     }
@@ -109,7 +113,7 @@ public class FileUtils {
         try {
             Files.writeString(newPath, fileContent);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.error("File in path: [{}] could not be updated",pathOfFile);
         }
 
     }
@@ -134,7 +138,7 @@ public class FileUtils {
                     Files.createDirectory(Paths.get(path + packageName + className));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("File: [{}] in directory: [{}] could not be created", className, packageName);
         }
     }
 
@@ -157,7 +161,7 @@ public class FileUtils {
                 return INTERFACE;
 
         } catch (IOException e) {
-            e.printStackTrace();
+           LOG.error("ClassType of [{}] could not be determined", entry.getPath());
         }
 
 
@@ -178,7 +182,7 @@ public class FileUtils {
             return new File(GridPaneNIO.class.getProtectionDomain().getCodeSource().getLocation()
                     .toURI()).getParentFile().getPath();
         } catch (URISyntaxException e) {
-            e.printStackTrace();
+            LOG.error("String could not be passed into URI");
         }
 
         return Constants.EMPTY_STRING;

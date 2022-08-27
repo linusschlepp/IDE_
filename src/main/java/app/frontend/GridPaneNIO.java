@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 public class GridPaneNIO {
 
 
-    public static Logger LOG = LoggerFactory.getLogger(GridPaneNIO.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GridPaneNIO.class);
     static Stage primaryStage;
     static Label label;
     TreeItem<CustomItem> retTreeItem;
@@ -192,7 +192,7 @@ public class GridPaneNIO {
             try {
                 addProject();
             } catch (IOException ex) {
-                ex.printStackTrace();
+                LOG.error("Project could not be added");
             }
         });
 
@@ -217,7 +217,8 @@ public class GridPaneNIO {
             try {
                 GitUtils.gitAdd(getRetTreeItem());
             } catch (IOException ex) {
-                ex.printStackTrace();
+                LOG.error("File: [{}] could not be added to Git",
+                        getRetTreeItem().getValue().getBoxText().getText());
             }
         });
 
@@ -230,7 +231,7 @@ public class GridPaneNIO {
             try {
                 GitUtils.gitInit(path);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                LOG.error("Init for path: [{}] was unsuccessful", path);
             }
         });
 
@@ -255,8 +256,8 @@ public class GridPaneNIO {
         menuItemSelectProject.setOnAction(e -> {
             try {
                 selectProject();
-            } catch (FileNotFoundException ignored) {
-
+            } catch (FileNotFoundException ex) {
+                LOG.error("Project could not be selected");
             }
         });
 
@@ -364,7 +365,7 @@ public class GridPaneNIO {
             //textArea gets resetted after selection
             textArea.setText(Constants.EMPTY_STRING);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Project could not be selected");
             return;
         }
 
@@ -535,7 +536,7 @@ public class GridPaneNIO {
 
                 textFlow.getChildren().addAll(projectText, pathText);
             } else
-                e.printStackTrace();
+               LOG.error("Path could not be written in currentProject");
         }
         return null;
     }
@@ -552,7 +553,7 @@ public class GridPaneNIO {
             // Clears text area after project file has been created
             textArea.setText(Constants.EMPTY_STRING);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.error("Project file could not be created for path: [{}]", path);
         }
     }
 
@@ -762,7 +763,7 @@ public class GridPaneNIO {
                 treeItem = treeItem.getParent();
             }
         } catch (ClassCastException ex) {
-            ex.printStackTrace();
+            LOG.error("Path could not be re/created");
         }
 
         sb.append(Constants.PACKAGE_STRING +Constants.SPACE_STRING);
@@ -852,7 +853,7 @@ public class GridPaneNIO {
             processBuilder.command(Constants.CMD, Constants.C, Constants.START, Constants.CMD, Constants.K, Constants.JAVA, relativePathMain + "\"").start();
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            LOG.error("A problem while executing the code occurred");
         }
 
         LOG.info("Successfully executed code");
@@ -911,7 +912,7 @@ public class GridPaneNIO {
                                 Paths.get(tempPath.replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.CLASS_FILE_EXTENSION)),
                                 StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LOG.error("A problem while finding pairs occurred");
                     }
                     break;
                 }
