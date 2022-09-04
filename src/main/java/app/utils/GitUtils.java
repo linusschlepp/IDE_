@@ -2,9 +2,11 @@ package app.utils;
 
 import app.backend.CustomItem;
 import app.frontend.AlertBox;
-import app.frontend.GridPaneNIO;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TreeItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +16,8 @@ import java.nio.file.Paths;
 
 public class GitUtils {
 
-    private static final ProcessBuilder processBuilder = new ProcessBuilder().directory(new File(GridPaneNIO.path));
+    private static final Logger LOG = LoggerFactory.getLogger(GitUtils.class);
+    private static final ProcessBuilder processBuilder = new ProcessBuilder().directory(new File(FrontendConstants.path));
 
 
     /**
@@ -54,7 +57,7 @@ public class GitUtils {
      */
     public static void gitCommit(String message) throws IOException {
 
-        if (checkIfInit(GridPaneNIO.path)) {
+        if (checkIfInit(FrontendConstants.path)) {
 
             String[] command = new String[]{Constants.CMD, Constants.C, Constants.START, Constants.CMD,
                     Constants.GIT, Constants.COMMIT, Constants.COMMIT_MESSAGE, "\""+message+
@@ -64,7 +67,7 @@ public class GitUtils {
         } else
             AlertBox.display(Alert.AlertType.WARNING, Constants.INIT_GIT_REPO_FIRST);
 
-        gitLog(GridPaneNIO.path);
+        gitLog(FrontendConstants.path);
     }
 
     /**
@@ -91,12 +94,13 @@ public class GitUtils {
      */
     public static void gitAdd(TreeItem<CustomItem> treeItem) throws IOException {
 
-        if (checkIfInit(GridPaneNIO.path)) {
-            String relativePathToAdd = treeItem.getValue().getPath().replace(GridPaneNIO.path+Constants.FILE_SEPARATOR,
+        if (checkIfInit(FrontendConstants.path)) {
+            String relativePathToAdd = treeItem.getValue().getPath().replace(FrontendConstants.path+Constants.FILE_SEPARATOR,
                     Constants.EMPTY_STRING);
-            new ProcessBuilder().directory(new File(GridPaneNIO.path))
-                    .command(Constants.CMD, Constants.C, Constants.START, Constants.GIT, Constants.GIT_ADD, relativePathToAdd
-                            ).start();
+
+            String[] command = {Constants.CMD, Constants.C, Constants.START, Constants.GIT, Constants.GIT_ADD, relativePathToAdd};
+
+            executeGitCommand(command);
         } else
             AlertBox.display(Alert.AlertType.WARNING, Constants.INIT_GIT_REPO_FIRST);
     }
@@ -110,7 +114,10 @@ public class GitUtils {
      */
     private static void executeGitCommand(String... command) throws IOException {
         processBuilder.command(command).start();
+
     }
+
+
 
 
 }

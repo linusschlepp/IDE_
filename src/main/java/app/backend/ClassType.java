@@ -1,6 +1,6 @@
 package app.backend;
 
-import app.frontend.GridPaneNIO;
+import app.frontend.FrontendInit;
 import app.utils.Constants;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,7 +20,7 @@ public enum ClassType {
         }
         @Override
         public ImageView getImage() {
-            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/packageIcon.png"))));
+            return new ImageView(new Image(Objects.requireNonNull(FrontendInit.class.getClassLoader().getResourceAsStream("images/packageIcon.png"))));
         }
     },
     CLASS{
@@ -30,7 +30,7 @@ public enum ClassType {
         }
         @Override
         public ImageView getImage() {
-            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/classIcon.png"))));
+            return new ImageView(new Image(Objects.requireNonNull(FrontendInit.class.getClassLoader().getResourceAsStream("images/classIcon.png"))));
         }
     },
     ENUM{
@@ -41,7 +41,7 @@ public enum ClassType {
 
         @Override
         public ImageView getImage() {
-            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/enumIcon.png"))));
+            return new ImageView(new Image(Objects.requireNonNull(FrontendInit.class.getClassLoader().getResourceAsStream("images/enumIcon.png"))));
         }
     },
     INTERFACE{
@@ -52,7 +52,7 @@ public enum ClassType {
 
         @Override
         public ImageView getImage() {
-            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/interfaceIcon.png"))));
+            return new ImageView(new Image(Objects.requireNonNull(FrontendInit.class.getClassLoader().getResourceAsStream("images/interfaceIcon.png"))));
         }
     },
     PROJECT{
@@ -64,7 +64,7 @@ public enum ClassType {
 
         @Override
         public ImageView getImage(){
-            return new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/projectIcon.png"))));
+            return new ImageView(new Image(Objects.requireNonNull(FrontendInit.class.getClassLoader().getResourceAsStream("images/projectIcon.png"))));
         }
     };
     //returns the type of class (class, enum, project, interface, package)  as a String

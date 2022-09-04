@@ -1,6 +1,6 @@
 package app.utils;
 
-import app.frontend.GridPaneNIO;
+import app.frontend.FrontendInit;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -40,12 +40,12 @@ public class CopyUtils {
 
         ImageView imageView = new ImageView();
         switch (menuItem.getText()) {
-            case "Delete" -> imageView = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/terminateIcon.png"))));
+            case "Delete" -> imageView = new ImageView(new Image(Objects.requireNonNull(FrontendInit.class.getClassLoader().getResourceAsStream("images/terminateIcon.png"))));
             case "Add Interface" -> imageView = INTERFACE.getImage();
             case "Add Class" -> imageView = CLASS.getImage();
             case "Add Enum" -> imageView = ENUM.getImage();
             case "Add Package" -> imageView = PACKAGE.getImage();
-            case "Rename" -> imageView = new ImageView(new Image(Objects.requireNonNull(GridPaneNIO.class.getClassLoader().getResourceAsStream("images/renameIcon.png"))));
+            case "Rename" -> imageView = new ImageView(new Image(Objects.requireNonNull(FrontendInit.class.getClassLoader().getResourceAsStream("images/renameIcon.png"))));
 
         }
         imageView.setFitHeight(17);

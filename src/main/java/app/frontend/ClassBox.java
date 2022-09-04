@@ -1,7 +1,9 @@
 package app.frontend;
 import app.backend.ClassType;
 import app.backend.CustomItem;
+import app.utils.CommandUtils;
 import app.utils.Constants;
+import app.utils.FrontendConstants;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -25,7 +27,7 @@ import static app.backend.ClassType.*;
 public class ClassBox {
 
     static String defaultValue;
-    static boolean isSelected = false;
+    public static boolean isSelected = false;
     static ComboBox<String> comboBox = new ComboBox<>();
     public static Logger LOG = LoggerFactory.getLogger(DeleteBox.class);
 
@@ -33,7 +35,7 @@ public class ClassBox {
     public static void display(ClassType classKind, boolean isPackage) {
 
 
-        if (!GridPaneNIO.path.isEmpty()) {
+        if (!FrontendConstants.path.isEmpty()) {
 
             CheckBox checkBox = new CheckBox(Constants.IS_MAIN);
 
@@ -55,7 +57,7 @@ public class ClassBox {
                 grdPane.getChildren().add(checkBox);
             }
             //if no packages exist, the dropdown will not be displayed
-            if (GridPaneNIO.packageNameHashMap.isEmpty()) {
+            if (FrontendConstants.packageNameHashMap.isEmpty()) {
                 GridPane.setConstraints(button, 0, 3);
                 grdPane.getChildren().addAll(label, textField, button);
                 //if packages exist, the dropdown will be filled with the contents of the packageNameHashMap
@@ -63,7 +65,7 @@ public class ClassBox {
                 //comboBox gets initialized everytime when ClassBox is called
                 comboBox = new ComboBox<>();
                 comboBox.setValue(defaultValue);
-                for (String s : GridPaneNIO.packageNameHashMap.keySet())
+                for (String s : FrontendConstants.packageNameHashMap.keySet())
                     comboBox.getItems().add(s);
                 Label labelPackage = new Label(Constants.ADD+Constants.SPACE_STRING+classKind.getClassType()+
                         Constants.SPACE_STRING+Constants.SPECIFIC_PACKAGE);
@@ -84,15 +86,15 @@ public class ClassBox {
                 try {
                     if (selectedValue != null && !Objects.requireNonNull(selectedValue).isEmpty())
 
-                        GridPaneNIO.addToPackage(selectedValue, textField.getText(), classKind,
-                                new File(GridPaneNIO.path + GridPaneNIO.getCorrectPath(Objects
+                        CommandUtils.addToPackage(selectedValue, textField.getText(), classKind,
+                                new File(FrontendConstants.path + CommandUtils.getCorrectPath(Objects
                                         .requireNonNull(getRequiredTreeItem(selectedValue)))+ Constants.FILE_SEPARATOR+selectedValue));
                     else if (!isPackage)
                         //if isPackage is false, we just add a Class to the filesystem as well as to the TreeView
-                        GridPaneNIO.addClass(textField.getText(), classKind);
+                        CommandUtils.addClass(textField.getText(), classKind);
                     else
                         // if is Package is true, we add a Package to the filesystem as well as to the TreeView
-                        GridPaneNIO.addPackage(textField.getText(), new File(GridPaneNIO.path +
+                        CommandUtils.addPackage(textField.getText(), new File(FrontendConstants.path +
                                 Constants.FILE_SEPARATOR + textField.getText()));
                 } catch (IOException ex) {
                     LOG.error("[{}] [{}] could not be added", classKind.getClassType(),
@@ -116,9 +118,9 @@ public class ClassBox {
      */
     private static TreeItem<CustomItem> getRequiredTreeItem(String packageName) {
 
-        for(String s : GridPaneNIO.packageNameHashMap.keySet()){
+        for(String s : FrontendConstants.packageNameHashMap.keySet()){
             if (s.equals(packageName))
-                return GridPaneNIO.packageNameHashMap.get(s);
+                return FrontendConstants.packageNameHashMap.get(s);
         }
 
 
