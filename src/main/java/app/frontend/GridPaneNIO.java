@@ -934,4 +934,15 @@ public class GridPaneNIO {
     }
 
 
+    public HashMap<String, TreeItem<CustomItem>> getPackageNameHashMap() {
+
+        return packageNameHashMap;
+    }
+
+    public HashMap<TextArea, String> getTextAreaStringHashMap() {
+
+        return textAreaStringHashMap;
+    }
+
+
 }

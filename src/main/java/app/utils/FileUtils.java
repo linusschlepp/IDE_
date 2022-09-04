@@ -163,11 +163,7 @@ public class FileUtils {
         } catch (IOException e) {
            LOG.error("ClassType of [{}] could not be determined", entry.getPath());
         }
-
-
         return CLASS;
-
-
     }
 
 
