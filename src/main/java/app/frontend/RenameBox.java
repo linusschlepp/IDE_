@@ -4,6 +4,7 @@ import app.backend.ClassType;
 import app.backend.CustomItem;
 import app.utils.Constants;
 import app.utils.FileUtils;
+import app.utils.FrontendConstants;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -52,7 +53,7 @@ public class RenameBox {
                     Path source = Paths.get(treeItem.getValue().getPath());
 
                     treeItem.getValue().setBoxText(textField.getText());
-                    GridPaneNIO.packageNameHashMap.put(textField.getText(), GridPaneNIO.packageNameHashMap.remove(oldName));
+                    FrontendConstants.packageNameHashMap.put(textField.getText(), FrontendConstants.packageNameHashMap.remove(oldName));
                     Files.move(source, source.resolveSibling(textField.getText()));
 
                     // changes the name of the parent-package

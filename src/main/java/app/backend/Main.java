@@ -1,6 +1,6 @@
 package app.backend;
 
-import app.frontend.GridPaneNIO;
+import app.frontend.FrontendInit;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -19,7 +19,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        GridPaneNIO grid = new GridPaneNIO(primaryStage);
+        FrontendInit grid = new FrontendInit(primaryStage);
         grid.init();
 
 

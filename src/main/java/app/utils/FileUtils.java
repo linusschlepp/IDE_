@@ -1,7 +1,7 @@
 package app.utils;
 
 import app.backend.ClassType;
-import app.frontend.GridPaneNIO;
+import app.frontend.FrontendInit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -175,7 +175,7 @@ public class FileUtils {
     public static String getRelativePath() {
 
         try {
-            return new File(GridPaneNIO.class.getProtectionDomain().getCodeSource().getLocation()
+            return new File(FrontendInit.class.getProtectionDomain().getCodeSource().getLocation()
                     .toURI()).getParentFile().getPath();
         } catch (URISyntaxException e) {
             LOG.error("String could not be passed into URI");
