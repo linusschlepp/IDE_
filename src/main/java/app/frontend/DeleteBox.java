@@ -24,10 +24,13 @@ import java.util.Comparator;
 public class DeleteBox {
 
 
-    public static Logger LOG = LoggerFactory.getLogger(DeleteBox.class);
+    public static final Logger LOG = LoggerFactory.getLogger(DeleteBox.class);
 
+    private DeleteBox() {
+        // Private-Constructor to hide implicit, default constructor
+    }
 
-    public static void display(TreeItem<CustomItem> treeItem) {
+    public static void display(final TreeItem<CustomItem> treeItem) {
 
         Stage window = new Stage();
         window.setTitle(Constants.DELETE + Constants.EMPTY_STRING + treeItem.getValue().getLabelText());

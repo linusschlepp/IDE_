@@ -8,40 +8,23 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.*;
-import javafx.scene.text.Font;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import java.awt.*;
 import java.io.*;
-
-import java.nio.file.*;
 import java.util.*;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-
-
 public class FrontendInit {
 
-
     private static final Logger LOG = LoggerFactory.getLogger(FrontendInit.class);
-
 
 
     /**
@@ -50,7 +33,7 @@ public class FrontendInit {
      *
      * @param primaryStage mainStage, which is getting passed by the main class
      */
-    public FrontendInit(Stage primaryStage) {
+    public FrontendInit(final Stage primaryStage) {
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
         FrontendConstants.primaryStage = primaryStage;
@@ -221,11 +204,7 @@ public class FrontendInit {
         FrontendConstants.menuItemSelectProject.setGraphic(viewMenuItem);
         FrontendConstants.menuItemSelectProject.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         FrontendConstants.menuItemSelectProject.setOnAction(e -> {
-            try {
-                CommandUtils.selectProject();
-            } catch (FileNotFoundException ex) {
-                LOG.error("Project could not be selected");
-            }
+            CommandUtils.selectProject();
         });
 
 

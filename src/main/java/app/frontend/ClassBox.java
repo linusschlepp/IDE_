@@ -32,7 +32,7 @@ public class ClassBox {
     public static Logger LOG = LoggerFactory.getLogger(DeleteBox.class);
 
 
-    public static void display(ClassType classKind, boolean isPackage) {
+    public static void display(final ClassType classKind, final boolean isPackage) {
 
 
         if (!FrontendConstants.path.isEmpty()) {

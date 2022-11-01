@@ -94,8 +94,6 @@ public class CustomItem extends GridPane {
         return imageView;
     }
 
-
-
     public void setText(String text){
         textArea.setText(text);
     }

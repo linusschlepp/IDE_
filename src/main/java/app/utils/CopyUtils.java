@@ -10,7 +10,14 @@ import java.util.Objects;
 import static app.backend.ClassType.*;
 import static app.backend.ClassType.PACKAGE;
 
-public class CopyUtils {
+public final class CopyUtils {
+
+
+
+    private CopyUtils() {
+        // private constructor as this is an utils-class
+    }
+
 
     /**
      * Helper-method, which copies MenuItems. This enables the addition of one MenuItem to multiple ContextMenus
@@ -18,7 +25,7 @@ public class CopyUtils {
      * @param menuItem menuItem, which is getting copied
      * @return copy of menuItem
      */
-    public static MenuItem copyMenuItem(MenuItem menuItem) {
+    public static MenuItem copyMenuItem(final MenuItem menuItem) {
 
         MenuItem menuItemCopy = new MenuItem();
         menuItemCopy.setText(menuItem.getText());

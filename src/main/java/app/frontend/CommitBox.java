@@ -20,8 +20,11 @@ import java.io.IOException;
  */
 public class CommitBox {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CommitBox.class);
 
-    private final static Logger LOG = LoggerFactory.getLogger(CommitBox.class);
+    private CommitBox() {
+        // Private-Constructor to hide implicit, default constructor
+    }
 
     public static void display() {
 
