@@ -21,9 +21,14 @@ import java.nio.file.*;
 public class RenameBox {
 
 
-    private final static Logger LOG = LoggerFactory.getLogger(RenameBox.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RenameBox.class);
 
-    public static void display(TreeItem<CustomItem> treeItem) {
+    private RenameBox() {
+        // Private-Constructor to hide implicit, default constructor
+    }
+
+
+    public static void display(final TreeItem<CustomItem> treeItem) {
 
 
         Stage window = new Stage();
@@ -76,7 +81,7 @@ public class RenameBox {
                 if (ex instanceof FileAlreadyExistsException) {
                     AlertBox.display(Alert.AlertType.WARNING, "A file with the name: " + textField.getText() +
                             " already exists, please choose a different name");
-                    LOG.error("File could not be renamed, a file with the name: [{}], does already exist", textField.getText());
+                    LOG.error("File could not be renamed, a file with the name: [{}], does already exist", textField.getText()  );
                 }else
                     LOG.error("[{}], [{}] could not be renamed", treeItem.getValue().getClassType().getClassType(),
                             treeItem.getValue().getBoxText().getText());
@@ -107,7 +112,7 @@ public class RenameBox {
      * @param newName new Name of parent-treeItem
      * @param oldName old Name of parent-treeItem
      */
-    private static void changeClassContentRec(ObservableList<TreeItem<CustomItem>> list, String newName, String oldName) {
+    private static void changeClassContentRec(final ObservableList<TreeItem<CustomItem>> list, final String newName, final String oldName) {
 
         if (list.isEmpty())
             return;

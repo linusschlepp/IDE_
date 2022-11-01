@@ -29,7 +29,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class CommandUtils   {
+public final class CommandUtils   {
 
 
 
@@ -62,9 +62,8 @@ public class CommandUtils   {
     /**
      * Opens File-Explorer and selects location of the project
      *
-     * @throws FileNotFoundException NIO-codesegments are getting used
      */
-    public static void selectProject() throws FileNotFoundException {
+    public static void selectProject() {
 
         DirectoryChooser directoryChooser = new DirectoryChooser();
 
@@ -112,7 +111,7 @@ public class CommandUtils   {
      * @param classKind kind of the class enum, interface etc.
      */
     private static void addClass(File file, ClassType classKind) {
-        TextArea tArea = new TextArea(FileUtils.getClassContent(file));
+        TextArea tArea = new TextArea(FileUtils.getClassContent(file.getPath()));
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(file.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING)),
                 tArea, file.getPath(), classKind));
         FrontendConstants.TreeItemProject.getChildren().add(treeItem);
@@ -138,7 +137,7 @@ public class CommandUtils   {
             FrontendConstants.packageNameHashMap.put(className, treeItem);
             FrontendConstants.packageNameHashMap.get(packageName).getChildren().add(treeItem);
         } else {
-            TextArea tArea = new TextArea(FileUtils.getClassContent(file));
+            TextArea tArea = new TextArea(FileUtils.getClassContent(file.getPath()));
 
             treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className),
                     tArea, filePath, classKind));
@@ -183,18 +182,18 @@ public class CommandUtils   {
      *
      * @param file represents the project structure or is the project
      */
-    private static void recreateRecProject(File file) {
+    private static void recreateRecProject(final File file) {
 
         if (file.isDirectory()) {
             if (!file.getName().equals(Constants.OUTPUT_DIR) && !file.getName().equals(Constants.GIT_DIR)) {
                 File[] entries = file.listFiles();
                 if (entries != null) {
-                    for (File entry : entries) {
+                    for (final File entry : entries) {
                         if (file.getPath().equals(FrontendConstants.path)) {
                             if (entry.isDirectory() && !entry.getName().equals(Constants.OUTPUT_DIR) && !entry.getName().equals(Constants.GIT_DIR))
                                 addPackage1(entry.getName(), entry);
                             else if (entry.isFile() && !entry.getName().equals(Constants.OUTPUT_DIR) && !entry.getName().equals(Constants.GIT_DIR))
-                                addClass(entry, FileUtils.checkForClassType(entry));
+                                addClass(entry, FileUtils.getClassType(entry));
                         } else {
                             if (entry.isDirectory() && !entry.getName().equals(Constants.OUTPUT_DIR) && !entry.getName().equals(Constants.GIT_DIR))
                                 addToPackage(new File(entry.getParent()).getName(),
@@ -202,7 +201,7 @@ public class CommandUtils   {
                             else
                                 addToPackage(new File(entry.getParent()).getName(), entry.getPath(),
                                         entry.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING),
-                                        FileUtils.checkForClassType(entry), entry);
+                                        FileUtils.getClassType(entry), entry);
                         }
                         if (entry.isDirectory())
                             recreateRecProject(entry);
@@ -211,10 +210,10 @@ public class CommandUtils   {
             }
         } else {
             if (file.getPath().equals(FrontendConstants.path)) {
-                addClass(file, FileUtils.checkForClassType(file));
+                addClass(file, FileUtils.getClassType(file));
             } else {
                 addToPackage(new File(file.getParent()).getName(), file.getPath(),
-                        file.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING), FileUtils.checkForClassType(file), file);
+                        file.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING), FileUtils.getClassType(file), file);
             }
 
         }
@@ -360,20 +359,11 @@ public class CommandUtils   {
      * @param className name of the class/ file
      * @param classKind kind of the class e.g. enum, interface  etc.
      */
-    public static void addClass(String className, ClassType classKind) {
+    public static void addClass(final String className, final ClassType classKind) {
 
         LOG.info("Adding class: [{}]", className);
 
         TextArea tArea = new TextArea(getClassContent(className, classKind.getClassType()));
-//        tArea.textProperty().addListener((ObservableValue<? extends String> o, String oldValue, String newValue) ->
-//        {
-//
-//            if (isValid(newValue)) {
-//                tArea.setStyle("-fx-text-inner-color: #BA55D3;");
-//            } else {
-//                tArea.setStyle(null);
-//            }
-//        });
         //TreeItem is getting created
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(),
                 new Label(className), tArea, FrontendConstants.path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION, classKind));
@@ -391,7 +381,7 @@ public class CommandUtils   {
      * @param packageName name of the package
      * @throws IOException due to the creation of a directory
      */
-    public static void addPackage(String packageName, File file) throws IOException {
+    public static void addPackage(final String packageName, final File file) throws IOException {
 
         LOG.info("Adding package: [{}]", packageName);
 
@@ -413,10 +403,8 @@ public class CommandUtils   {
      * @param packageName name of the individual-package
      * @param className   name of the class/ file, which is getting stored in the package
      * @param classKind   kind of the class enum, interface etc.
-     * @throws FileNotFoundException gets thrown because createFile-method is getting called
      */
-    public static void addToPackage(String packageName, String className, ClassType classKind, File file) throws
-            FileNotFoundException {
+    public static void addToPackage(final String packageName, final String className, final ClassType classKind, final File file) {
 
         LOG.info("Adding class: [{}] to package: [{}]", className, packageName);
 
@@ -453,7 +441,7 @@ public class CommandUtils   {
      * @param classKind   classKind e.g. enum
      * @return instance of TextArea with corresponding content
      */
-    private static TextArea generateTextAreaContent(String packageName, String className, ClassType classKind) {
+    private static TextArea generateTextAreaContent(final String packageName, final String className, final ClassType classKind) {
 
         LOG.info("Creating file-content of: [{}]", className);
 
@@ -478,7 +466,7 @@ public class CommandUtils   {
         FrontendConstants.sb.setLength(0);
 
         try {
-            while (treeItem.getParent() != null) {
+            while (!Objects.isNull(treeItem.getParent())) {
                 if (!(treeItem.getParent().getValue().getBoxText().getText().equals(FrontendConstants.fileName)))
                     stringList.add(treeItem.getParent().getValue().getBoxText().getText());
                 treeItem = treeItem.getParent();
@@ -516,7 +504,7 @@ public class CommandUtils   {
      * @param className    name of the class/ file
      * @return standard content of each class
      */
-    private static String getClassContent(String classContent, String className) {
+    private static String getClassContent(final String classContent, final String className) {
 
         FrontendConstants.sb.append(Constants.PUBLIC+Constants.SPACE_STRING).append(className).append(Constants.SPACE_STRING).append(classContent).append(Constants.CURLY_BRACKETS_OPEN)
                 .append(Constants.DOUBLE_NEW_LINE);
@@ -573,7 +561,7 @@ public class CommandUtils   {
             TimeUnit.MILLISECONDS.sleep(1000);
             processBuilder.command(Constants.CMD, Constants.C, Constants.START, Constants.CMD, Constants.K, Constants.JAVA, relativePathMain + "\"").start();
 
-        } catch (Exception ex) {
+        } catch (final Exception e) {
             LOG.error("A problem while executing the code occurred");
         }
 
@@ -585,12 +573,12 @@ public class CommandUtils   {
      *
      * @param dir directory, where the project is located
      */
-    static void findFilesRec(File dir) {
+    static void findFilesRec(final File dir) {
         if (dir.isDirectory()) {
             if (!dir.getName().equals(Constants.OUTPUT_DIR) && !dir.getName().equals(Constants.GIT_DIR)) {
                 File[] entries = dir.listFiles();
-                if (entries != null) {
-                    for (File entry : entries) {
+                if (!Objects.isNull(entries)) {
+                    for (final File entry : entries) {
                         if (entry.isFile())
                             FrontendConstants.listFiles.add(entry);
                         if (entry.isDirectory())
@@ -608,19 +596,19 @@ public class CommandUtils   {
      */
     private static void findPairs() {
 
-        LOG.info(String.format("Creating pairs for %s and %s-files...", Constants.CLASS_FILE_EXTENSION, Constants.JAVA_FILE_EXTENSION));
+        LOG.info(String.format("Creating pairs for %s and %s-files", Constants.CLASS_FILE_EXTENSION, Constants.JAVA_FILE_EXTENSION));
 
         File[] dir = new File(FrontendConstants.path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR).listFiles();
         int counter = 0;
 
-        if (dir == null)
+        if (Objects.isNull(dir))
             return;
 
-        for (File f : FrontendConstants.listFiles) {
+        for (final File f : FrontendConstants.listFiles) {
             String tempPath;
             Path tempFile;
 
-            for (File f1 : dir) {
+            for (final File f1 : dir) {
                 if (f1.isDirectory() || !f1.getName().contains(Constants.CLASS_FILE_EXTENSION))
                     continue;
                 if (f.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING).
@@ -641,7 +629,7 @@ public class CommandUtils   {
             counter++;
         }
 
-        LOG.info(String.format("Successfully created pairs for %s and %s-files...", Constants.CLASS_FILE_EXTENSION, Constants.JAVA_FILE_EXTENSION));
+        LOG.info(String.format("Successfully created pairs for %s and %s-files", Constants.CLASS_FILE_EXTENSION, Constants.JAVA_FILE_EXTENSION));
 
     }
 

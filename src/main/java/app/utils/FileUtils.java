@@ -10,93 +10,103 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.Comparator;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static app.backend.ClassType.*;
 import static app.backend.ClassType.CLASS;
 
-public class FileUtils {
+public final class FileUtils {
 
+    private static final Logger LOG = LoggerFactory.getLogger(FileUtils.class);
 
-    private static final Logger LOG  = LoggerFactory.getLogger(FileUtils.class);
+    private FileUtils() {
+        // private constructor as this is an utils-class
+    }
 
     /**
      * Creates files in the requested locations
      *
-     * @param classContent content of the class/ file
-     * @param className    name of the class/ file
+     * @param classContent Content of the class/ file
+     * @param className    Name of the class/ file
      */
-    public static void createFile(String path, String classContent, String className) {
+    public static void createFile(final String path, final String classContent, final String className) {
 
         try {
-            if (!Files.exists(Paths.get(path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION)))
-                Files.createFile(Paths.get(path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION));
-            Files.writeString(Paths.get(path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION), classContent);
-        } catch (IOException e) {
-            LOG.error("File: [{}] in [{}] could not be created", className, path);
+            final Path concatenatedPath = Paths.get(path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION);
+            if (!Files.exists(concatenatedPath))
+                Files.createFile(concatenatedPath);
+            Files.writeString(concatenatedPath, classContent);
+            LOG.info("Created file: {} in {}", className, path);
+        } catch (final IOException e) {
+            LOG.error("File: [{}] in [{}] could not be created", className,
+                    path);
         }
     }
 
     /**
      * Output-folder is getting created, files are getting stored in it
      *
-     * @throws IOException new files are getting instantiated
+     * @throws IOException New files are getting instantiated
      */
-    public static void generateOutputFolder(String path) throws IOException {
+    public static void generateOutputFolder(final String path) throws IOException {
 
-        //Output-Folder gets deleted before every execution of the program
-        if (Files.exists(Paths.get(path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR)))
-            Files.walk(Paths.get(path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR)).sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
+
+        final Path concatenatedPath = Paths.get(path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR);
+        //Output-Folder gets cleared before every execution of the program
+        if (Files.exists(concatenatedPath))
+            try (Stream<Path> walk = Files.walk(concatenatedPath)) {
+                walk.sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
+            }
 
         try {
             //if the output-folder doesn't exist yet, it is getting created
-            Files.createDirectory(Paths.get(path + Constants.FILE_SEPARATOR + Constants.OUTPUT_DIR));
-        }catch(FileAlreadyExistsException e){
-            LOG.error("File in path: [{}] already exists and could therefore not be created", path);
+            Files.createDirectory(concatenatedPath);
+        } catch (FileAlreadyExistsException e) {
+            LOG.error("File: [{}] already exists and could therefore not be created", path);
         }
-
-
     }
-    
+
     /**
      * Copies directories the contents of the source-directory into the directory
      *
-     * @param sourceDirectoryLocation      path of the individual project
-     * @param destinationDirectoryLocation path of the output folder
+     * @param sourceDirectoryLocation      Path of the individual project
+     * @param destinationDirectoryLocation Path of the output folder
      * @throws IOException NIO-segments are getting used
      */
-    public static void copyDirectory(String sourceDirectoryLocation, String destinationDirectoryLocation) throws IOException {
+    public static void copyDirectory(final String sourceDirectoryLocation, final String destinationDirectoryLocation) throws IOException {
 
-        Files.walk(Paths.get(sourceDirectoryLocation))
-                .forEach(source -> {
-                    Path destination = Paths.get(destinationDirectoryLocation, source.toString()
-                            .substring(sourceDirectoryLocation.length()));
-                    try {
-                        if (!source.getFileName().toString().equals(Constants.OUTPUT_DIR))
-                            Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
-                    } catch (IOException e) {
-                        LOG.error("Directory: [{}] could not be copied into: [{}]", sourceDirectoryLocation, destinationDirectoryLocation);
-                    }
-                });
+        try (Stream<Path> walk = Files.walk(Paths.get(sourceDirectoryLocation))) {
+            walk.forEach(source -> {
+                        Path destination = Paths.get(destinationDirectoryLocation, source.toString()
+                                .substring(sourceDirectoryLocation.length()));
+                        try {
+                            if (!source.getFileName().toString().equals(Constants.OUTPUT_DIR))
+                                Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (IOException e) {
+                            LOG.error("Directory: [{}] could not be copied into: [{}]", sourceDirectoryLocation, destinationDirectoryLocation);
+                        }
+                    });
+        }
+
     }
 
 
     /**
      * Returns the content of a file as a String variable
      *
-     * @param file the file, which content is needed
-     * @return content of file-parameter as String
+     * @param filePath Path of the file, which content is needed
+     * @return Content of given file
      */
-    public static String getClassContent(File file) {
-        StringBuilder sb = new StringBuilder();
+    public static String getClassContent(final String filePath) {
+
         try {
-            Files.lines(Paths.get(String.valueOf(file))).forEach(s -> sb.append(s).append(Constants.NEW_LINE));
-        } catch (Exception e) {
-            LOG.error("File: [{}] could not be read", file.getPath());
+            return Files.readString(Paths.get(filePath));
+        } catch (final Exception e) {
+            LOG.error("File: [{}] could not be read", filePath);
         }
-        return sb.toString();
+        return "";
     }
 
 
@@ -104,16 +114,16 @@ public class FileUtils {
      * When the text in the textArea of each class changes, the content of the file is getting changed as well
      *
      * @param fileContent content of the file/ class
-     * @param pathOfFile  the location of the file
+     * @param filePath  the location of the file
      */
-    public static void updateFile(String fileContent, String pathOfFile) {
+    public static void updateFile(final String fileContent, final String filePath) {
         Path newPath;
-        newPath = pathOfFile.contains(Constants.JAVA_FILE_EXTENSION) ? Paths.get(pathOfFile) : 
-                Paths.get(pathOfFile + Constants.JAVA_FILE_EXTENSION);
+        newPath = filePath.contains(Constants.JAVA_FILE_EXTENSION) ? Paths.get(filePath) :
+                Paths.get(filePath + Constants.JAVA_FILE_EXTENSION);
         try {
             Files.writeString(newPath, fileContent);
         } catch (Exception ex) {
-            LOG.error("File in path: [{}] could not be updated",pathOfFile);
+            LOG.error("File: [{}] could not be updated", filePath);
         }
 
     }
@@ -122,12 +132,12 @@ public class FileUtils {
     /**
      * Creates Files within packages  in the fileSystem
      *
-     * @param classContent content of the class/ file
-     * @param packageName  name of the package/ directory
-     * @param className    name of the file
-     * @param isPackage    checks if file is a package and if a directory has to be created
+     * @param classContent Content of the class/ file
+     * @param packageName  Name of the package/ directory
+     * @param className    Name of the file
+     * @param isPackage    Checks if the file is a package and therefore a directory has to be created
      */
-    public static void createFile(String path, String classContent, String packageName, String className, boolean isPackage) {
+    public static void createFile(final String path, final String classContent, final String packageName, final String className, final boolean isPackage) {
 
         try {
             if (!isPackage) {
@@ -138,6 +148,7 @@ public class FileUtils {
                     Files.createDirectory(Paths.get(path + packageName + className));
             }
         } catch (IOException e) {
+            e.printStackTrace();
             LOG.error("File: [{}] in directory: [{}] could not be created", className, packageName);
         }
     }
@@ -145,32 +156,37 @@ public class FileUtils {
     /**
      * Determines the class-type by checking the content of the files for the keywords: enum, interface and class
      *
-     * @param entry file, which is getting checked
-     * @return the corresponding classType
+     * @param entry File, which is getting checked
+     * @return The corresponding classType
      */
-    public static ClassType checkForClassType(File entry) {
+    public static ClassType getClassType(final File entry) {
 
         try {
-            String fileContent = Files.lines(Paths.get(entry.getPath())).collect(Collectors.toList()).toString();
+            try (Stream<String> lines = Files.lines(Paths.get(entry.getPath()))) {
 
-            if (fileContent.contains(Constants.CLASS_STRING))
-                return CLASS;
-            if (fileContent.contains(Constants.ENUM_STRING))
-                return ENUM;
-            if (fileContent.contains(Constants.INTERFACE_STRING))
-                return INTERFACE;
+                String fileContent = lines.toList().toString();
 
-        } catch (IOException e) {
-           LOG.error("ClassType of [{}] could not be determined", entry.getPath());
-        }
-        return CLASS;
+                if (fileContent.contains(Constants.CLASS_STRING))
+                    return CLASS;
+                if (fileContent.contains(Constants.ENUM_STRING))
+                    return ENUM;
+                if (fileContent.contains(Constants.INTERFACE_STRING))
+                    return INTERFACE;
+            }
+
+            } catch (IOException e) {
+                LOG.error("ClassType of file: [{}] could not be determined", entry.getPath());
+            }
+            // default return value
+            return CLASS;
+
     }
 
 
     /**
      * Returns the path, where the IDE is stored
      *
-     * @return relativePath of the IDE
+     * @return RelativePath of the IDE
      */
     public static String getRelativePath() {
 

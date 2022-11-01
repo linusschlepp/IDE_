@@ -14,11 +14,14 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class GitUtils {
+public final class GitUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(GitUtils.class);
     private static final ProcessBuilder processBuilder = new ProcessBuilder().directory(new File(FrontendConstants.path));
 
+    private GitUtils() {
+        //private Constructor as this is an Utils-class
+    }
 
     /**
      * Initializes git repo in corresponding path
@@ -26,7 +29,7 @@ public class GitUtils {
      * @param path Path in which the git repo is initialized
      * @throws IOException if error occurs
      */
-    public static void gitInit(String path) throws IOException {
+    public static void gitInit(final String path) throws IOException {
 
         if (!checkIfInit(path)) {
 
@@ -45,7 +48,7 @@ public class GitUtils {
      * @param path path in which we check
      * @return true if git-repo exists, false if not
      */
-    public static boolean checkIfInit(String path) {
+    public static boolean checkIfInit(final String path) {
         return Files.exists(Paths.get(path + Constants.FILE_SEPARATOR + Constants.GIT_DIR));
     }
 
@@ -55,7 +58,7 @@ public class GitUtils {
      * @param message Commit-message
      * @throws IOException if error occurs
      */
-    public static void gitCommit(String message) throws IOException {
+    public static void gitCommit(final String message) throws IOException {
 
         if (checkIfInit(FrontendConstants.path)) {
 
@@ -76,13 +79,11 @@ public class GitUtils {
      * @param path path in which the git-repo is located
      * @throws IOException if error occurs
      */
-    public static void gitLog(String path) throws IOException {
+    public static void gitLog(final String path) throws IOException {
         // ToDo: Implement method returning bufferedreader
         BufferedReader br = new BufferedReader(new InputStreamReader(new ProcessBuilder().directory(new File(path))
                 .command(Constants.CMD, Constants.C, Constants.START, Constants.GIT, Constants.LOG)
                 .start().getInputStream()));
-
-        br.lines().forEach(System.out::println);
 
     }
 
@@ -92,7 +93,7 @@ public class GitUtils {
      * @param treeItem item, which is added to git
      * @throws IOException if error occurs
      */
-    public static void gitAdd(TreeItem<CustomItem> treeItem) throws IOException {
+    public static void gitAdd(final TreeItem<CustomItem> treeItem) throws IOException {
 
         if (checkIfInit(FrontendConstants.path)) {
             String relativePathToAdd = treeItem.getValue().getPath().replace(FrontendConstants.path+Constants.FILE_SEPARATOR,
@@ -112,7 +113,7 @@ public class GitUtils {
      * @param command Command, which is executed
      * @throws IOException if error occurs
      */
-    private static void executeGitCommand(String... command) throws IOException {
+    private static void executeGitCommand(final String... command) throws IOException {
         processBuilder.command(command).start();
 
     }

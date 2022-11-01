@@ -1,10 +1,16 @@
 package app.utils;
 
 
+import java.io.File;
+
 /**
  * Contains all String-constants, used throughout this project
  */
-public class Constants {
+public final class Constants {
+
+    private Constants() {
+        //private-Constructor as this is a Constants-class
+    }
 
 
     public static final String OUTPUT_DIR = "output";
@@ -15,7 +21,7 @@ public class Constants {
 
     public static final String CLASS_FILE_EXTENSION = ".class";
 
-    public static final String FILE_SEPARATOR = "\\";
+    public static final String FILE_SEPARATOR = File.separator;
 
     public static final String EMPTY_STRING = "";
 

@@ -11,9 +11,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Constants, containing important objects for building the frontend
+ */
 public final class FrontendConstants {
 
 
+    private FrontendConstants() {
+        // Private-constructor as this is Constants-class
+    }
 
     public static Stage primaryStage;
 
@@ -21,7 +27,7 @@ public final class FrontendConstants {
 
     public static TreeItem<CustomItem> retTreeItem;
 
-    public static StringBuilder sb = new StringBuilder();
+    public static final StringBuilder sb = new StringBuilder();
 
     public static TextFlow textFlow = new TextFlow();
 
