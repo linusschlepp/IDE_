@@ -1,22 +1,28 @@
 package app.frontend;
 
+import app.backend.ClassType;
+import app.backend.CustomItem;
+import app.exceptions.IDEException;
 import app.utils.Constants;
+import app.utils.FrontendConstants;
 import app.utils.GitUtils;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 /**
- * Gets displayed, if the user wants to commit
+ * Gets displayed, if the user wants commit changes to git
  */
 public class CommitBox {
 
@@ -47,12 +53,28 @@ public class CommitBox {
 
         button.setOnAction( e-> {
             try {
-                GitUtils.gitCommit(textField.getText());
-            } catch (IOException ex) {
-                LOG.error("Commit was not possible");
+                buttonAction(textField.getText());
+            } catch (IDEException ex) {
+                throw new RuntimeException(ex);
             }
+        });
+
             window.close();
 
-        });
+    }
+
+
+    /**
+     * Logic is executed after button is pressed on GUI
+     *
+     * @param commitMessage Message, used for commit
+     * @throws IDEException If commit was not possible
+     */
+    private static void buttonAction(final String commitMessage) throws IDEException {
+        try {
+            GitUtils.gitCommit(commitMessage);
+        } catch (IOException ex) {
+            new IDEException("Commit was not possible").throwWithLogging(LOG);
+        }
     }
 }

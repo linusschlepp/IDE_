@@ -2,6 +2,7 @@ package app.utils;
 
 import app.backend.ClassType;
 import app.backend.CustomItem;
+import app.exceptions.IDEException;
 import app.frontend.ClassBox;
 import app.frontend.FrontendInit;
 import javafx.scene.control.Label;
@@ -29,6 +30,9 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ *  Utils-class, providing the functionality for the frontend
+ */
 public final class CommandUtils   {
 
 
@@ -62,8 +66,9 @@ public final class CommandUtils   {
     /**
      * Opens File-Explorer and selects location of the project
      *
+     * @throws IDEException If project could not be selected
      */
-    public static void selectProject() {
+    public static void selectProject() throws IDEException {
 
         DirectoryChooser directoryChooser = new DirectoryChooser();
 
@@ -82,8 +87,7 @@ public final class CommandUtils   {
             //textArea gets resetted after selection
             FrontendConstants.textArea.setText(Constants.EMPTY_STRING);
         } catch (Exception e) {
-            LOG.error("Project could not be selected");
-            return;
+            new IDEException("Project could not be selected").throwWithLogging(LOG);
         }
 
 
@@ -109,8 +113,9 @@ public final class CommandUtils   {
      *
      * @param file      file which is getting added
      * @param classKind kind of the class enum, interface etc.
+     * @throws IDEException If getting the class-content fails
      */
-    private static void addClass(File file, ClassType classKind) {
+    private static void addClass(File file, ClassType classKind) throws IDEException {
         TextArea tArea = new TextArea(FileUtils.getClassContent(file.getPath()));
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(file.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING)),
                 tArea, file.getPath(), classKind));
@@ -127,9 +132,10 @@ public final class CommandUtils   {
      * @param className   name of the class
      * @param classKind   kind of the class enum, interface etc.
      * @param file        individual file
+     * @throws IDEException If getting the class-content fails
      */
     public static void addToPackage(String packageName, String filePath, String className, ClassType
-            classKind, File file) {
+            classKind, File file) throws IDEException {
 
         TreeItem<CustomItem> treeItem;
         if (classKind.equals(ClassType.PACKAGE)) {
@@ -164,9 +170,11 @@ public final class CommandUtils   {
 
     /**
      * Recreates last used project
+     *
+     * @throws IDEException If adding the project fails
      */
-    public static void recreateProject() {
-        //if the project exists it gets added and recreated
+    public static void recreateProject() throws IDEException {
+        //If the project exists, it gets added and recreated
         LOG.info("Starting to recreate project...");
         if (getProjectPath() != null) {
             addProject(getProjectPath());
@@ -182,7 +190,7 @@ public final class CommandUtils   {
      *
      * @param file represents the project structure or is the project
      */
-    private static void recreateRecProject(final File file) {
+    private static void recreateRecProject(final File file) throws IDEException {
 
         if (file.isDirectory()) {
             if (!file.getName().equals(Constants.OUTPUT_DIR) && !file.getName().equals(Constants.GIT_DIR)) {
@@ -224,7 +232,7 @@ public final class CommandUtils   {
      *
      * @return File, which corresponds to the first line of the file currentProject
      */
-    private static File getProjectPath() {
+    private static File getProjectPath() throws IDEException {
 
         try {
             // if the file does not exist yet, it gets created
@@ -253,7 +261,7 @@ public final class CommandUtils   {
 
                 FrontendConstants.textFlow.getChildren().addAll(projectText, pathText);
             } else
-                LOG.error("Path could not be written in currentProject");
+                new IDEException("Path could not be written in currentProject").throwWithLogging(LOG);
         }
         return null;
     }
@@ -261,8 +269,10 @@ public final class CommandUtils   {
 
     /**
      * Creates/ overwrites the currentProject file
+     *
+     * @throws IDEException If project-file could not be created
      */
-    private static void createProjectFile() {
+    private static void createProjectFile() throws IDEException {
 
         try {
             Files.writeString(Paths.get(FileUtils.getRelativePath() + Constants.FILE_SEPARATOR +
@@ -270,7 +280,7 @@ public final class CommandUtils   {
             // Clears text area after project file has been created
             FrontendConstants.textArea.setText(Constants.EMPTY_STRING);
         } catch (Exception ex) {
-            LOG.error("Project file could not be created for path: [{}]", FrontendConstants.path);
+            new IDEException("Project file could not be created for path: [{}]", FrontendConstants.path).throwWithLogging(LOG);
         }
     }
 
@@ -280,7 +290,7 @@ public final class CommandUtils   {
      *
      * @throws IOException NIO code-segments are getting used
      */
-    public static void addProject() throws IOException {
+    public static void addProject() throws IOException, IDEException {
 
 
         LOG.info("Open FileDialog and adding project");
@@ -359,7 +369,7 @@ public final class CommandUtils   {
      * @param className name of the class/ file
      * @param classKind kind of the class e.g. enum, interface  etc.
      */
-    public static void addClass(final String className, final ClassType classKind) {
+    public static void addClass(final String className, final ClassType classKind) throws IDEException {
 
         LOG.info("Adding class: [{}]", className);
 
@@ -404,7 +414,7 @@ public final class CommandUtils   {
      * @param className   name of the class/ file, which is getting stored in the package
      * @param classKind   kind of the class enum, interface etc.
      */
-    public static void addToPackage(final String packageName, final String className, final ClassType classKind, final File file) {
+    public static void addToPackage(final String packageName, final String className, final ClassType classKind, final File file) throws IDEException {
 
         LOG.info("Adding class: [{}] to package: [{}]", className, packageName);
 
@@ -441,7 +451,7 @@ public final class CommandUtils   {
      * @param classKind   classKind e.g. enum
      * @return instance of TextArea with corresponding content
      */
-    private static TextArea generateTextAreaContent(final String packageName, final String className, final ClassType classKind) {
+    private static TextArea generateTextAreaContent(final String packageName, final String className, final ClassType classKind) throws IDEException {
 
         LOG.info("Creating file-content of: [{}]", className);
 
@@ -455,10 +465,15 @@ public final class CommandUtils   {
         return new TextArea(getClassContent(className, classKind.getClassType()));
     }
 
+
     /**
-     * Gets right path of packages
+     * Returns the path of given treeitem
+     *
+     * @param treeItem TreeItem, where path is needed
+     * @return Path of given treeItem
+     * @throws IDEException If Path could not be recreated
      */
-    public static String getCorrectPath(TreeItem<CustomItem> treeItem) {
+    public static String getCorrectPath(TreeItem<CustomItem> treeItem) throws IDEException {
 
         LOG.info("Creating correct path...");
         StringBuilder stringBuilder = new StringBuilder();
@@ -466,13 +481,13 @@ public final class CommandUtils   {
         FrontendConstants.sb.setLength(0);
 
         try {
-            while (!Objects.isNull(treeItem.getParent())) {
+            while (Objects.nonNull(treeItem.getParent())) {
                 if (!(treeItem.getParent().getValue().getBoxText().getText().equals(FrontendConstants.fileName)))
                     stringList.add(treeItem.getParent().getValue().getBoxText().getText());
                 treeItem = treeItem.getParent();
             }
         } catch (ClassCastException ex) {
-            LOG.error("Path could not be re/created");
+            new IDEException("Path could not be re/created").throwWithLogging(LOG);
         }
 
         FrontendConstants.sb.append(Constants.PACKAGE_STRING +Constants.SPACE_STRING);
@@ -500,9 +515,9 @@ public final class CommandUtils   {
     /**
      * Creates the contents of the classes right after their creation
      *
-     * @param classContent creates standard class content of each class
-     * @param className    name of the class/ file
-     * @return standard content of each class
+     * @param classContent Standard content of given class
+     * @param className    Name of the class/ file
+     * @return  Content of each class
      */
     private static String getClassContent(final String classContent, final String className) {
 
@@ -519,10 +534,13 @@ public final class CommandUtils   {
         return retString;
     }
 
+
     /**
      * Opens cmd, compiles each file and runs them
+     *
+     * @throws IDEException When a problem, while executing the code occurs
      */
-    public static void execute() {
+    public static void execute() throws IDEException {
 
         LOG.info("Trying to execute code...");
 
@@ -562,7 +580,7 @@ public final class CommandUtils   {
             processBuilder.command(Constants.CMD, Constants.C, Constants.START, Constants.CMD, Constants.K, Constants.JAVA, relativePathMain + "\"").start();
 
         } catch (final Exception e) {
-            LOG.error("A problem while executing the code occurred");
+            new IDEException("A problem while executing the code occurred").throwWithLogging(LOG);
         }
 
         LOG.info("Successfully executed code");
@@ -571,13 +589,13 @@ public final class CommandUtils   {
     /**
      * All files of dir Directory are getting stored in fileList
      *
-     * @param dir directory, where the project is located
+     * @param dir Directory, where the project is located
      */
     static void findFilesRec(final File dir) {
         if (dir.isDirectory()) {
             if (!dir.getName().equals(Constants.OUTPUT_DIR) && !dir.getName().equals(Constants.GIT_DIR)) {
                 File[] entries = dir.listFiles();
-                if (!Objects.isNull(entries)) {
+                if (Objects.nonNull(entries)) {
                     for (final File entry : entries) {
                         if (entry.isFile())
                             FrontendConstants.listFiles.add(entry);
@@ -590,11 +608,12 @@ public final class CommandUtils   {
             FrontendConstants.listFiles.add(dir);
     }
 
-
     /**
      * Pairs of .java and .class files are getting found and created
+     *
+     * @throws IDEException When a problem while finding .pairs occurs
      */
-    private static void findPairs() {
+    private static void findPairs() throws IDEException {
 
         LOG.info(String.format("Creating pairs for %s and %s-files", Constants.CLASS_FILE_EXTENSION, Constants.JAVA_FILE_EXTENSION));
 
@@ -621,7 +640,7 @@ public final class CommandUtils   {
                                 Paths.get(tempPath.replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.CLASS_FILE_EXTENSION)),
                                 StandardCopyOption.REPLACE_EXISTING);
                     } catch (IOException e) {
-                        LOG.error("A problem while finding pairs occurred");
+                        new IDEException("A problem while finding pairs occurred").throwWithLogging(LOG);
                     }
                     break;
                 }
@@ -638,6 +657,11 @@ public final class CommandUtils   {
         return FrontendConstants.retTreeItem;
     }
 
+    /**
+     * Sets the treeItem to be returned
+     *
+     * @param newRetTreeItem TreeItem to be returned
+     */
     public static void setRetTreeItem(TreeItem<CustomItem> newRetTreeItem) {
         FrontendConstants.retTreeItem = newRetTreeItem;
     }

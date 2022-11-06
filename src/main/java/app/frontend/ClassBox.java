@@ -1,6 +1,7 @@
 package app.frontend;
 import app.backend.ClassType;
 import app.backend.CustomItem;
+import app.exceptions.IDEException;
 import app.utils.CommandUtils;
 import app.utils.Constants;
 import app.utils.FrontendConstants;
@@ -79,30 +80,12 @@ public class ClassBox {
             window.show();
 
             button.setOnAction(e -> {
-                //checks if the class is Main
-                isSelected = checkBox.isSelected();
-                String selectedValue = comboBox.getValue();
-                //Exception needs to be caught, because addToPackage, addPackage and addClass are throwing IOExceptions
                 try {
-                    if (selectedValue != null && !Objects.requireNonNull(selectedValue).isEmpty())
-
-                        CommandUtils.addToPackage(selectedValue, textField.getText(), classKind,
-                                new File(FrontendConstants.path + CommandUtils.getCorrectPath(Objects
-                                        .requireNonNull(getRequiredTreeItem(selectedValue)))+ Constants.FILE_SEPARATOR+selectedValue));
-                    else if (!isPackage)
-                        //if isPackage is false, we just add a Class to the filesystem as well as to the TreeView
-                        CommandUtils.addClass(textField.getText(), classKind);
-                    else
-                        // if is Package is true, we add a Package to the filesystem as well as to the TreeView
-                        CommandUtils.addPackage(textField.getText(), new File(FrontendConstants.path +
-                                Constants.FILE_SEPARATOR + textField.getText()));
-                } catch (IOException ex) {
-                    LOG.error("[{}] [{}] could not be added", classKind.getClassType(),
-                            selectedValue);
+                    buttonAction(textField, classKind, checkBox, isPackage, window);
+                } catch (IDEException ex) {
+                    throw new RuntimeException(ex);
                 }
 
-                window.close();
-                defaultValue = Constants.EMPTY_STRING;
             });
             //if the path is empty the AlertBox will be displayed
         } else
@@ -123,8 +106,37 @@ public class ClassBox {
                 return FrontendConstants.packageNameHashMap.get(s);
         }
 
-
         return null;
+    }
+
+
+    private static void buttonAction(final TextField textField, final ClassType classKind, final CheckBox checkBox, final boolean isPackage, final Stage window) throws IDEException {
+
+
+        //checks if the class is Main
+        isSelected = checkBox.isSelected();
+        String selectedValue = comboBox.getValue();
+        //Exception needs to be caught, because addToPackage, addPackage and addClass are throwing IOExceptions
+        try {
+            if (selectedValue != null && !Objects.requireNonNull(selectedValue).isEmpty())
+
+                CommandUtils.addToPackage(selectedValue, textField.getText(), classKind,
+                        new File(FrontendConstants.path + CommandUtils.getCorrectPath(Objects
+                                .requireNonNull(getRequiredTreeItem(selectedValue)))+ Constants.FILE_SEPARATOR+selectedValue));
+            else if (!isPackage)
+                //if isPackage is false, we just add a Class to the filesystem as well as to the TreeView
+                CommandUtils.addClass(textField.getText(), classKind);
+            else
+                // if is Package is true, we add a Package to the filesystem as well as to the TreeView
+                CommandUtils.addPackage(textField.getText(), new File(FrontendConstants.path +
+                        Constants.FILE_SEPARATOR + textField.getText()));
+        } catch (final IOException | IDEException ex) {
+            new IDEException("[{}] [{}] could not be added", classKind.getClassType(),
+                    selectedValue).throwWithLogging(LOG);
+        }
+
+        window.close();
+        defaultValue = Constants.EMPTY_STRING;
 
     }
 }
