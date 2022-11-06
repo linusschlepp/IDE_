@@ -1,14 +1,14 @@
 package app.backend;
 
+import app.exceptions.IDEException;
 import app.frontend.FrontendInit;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
 /**
- * Instantiates one instance of GridPaneNIO and passes it to the primaryStage
+ * Instantiates one instance of {@link FrontendInit} and passes it to the primaryStage
  *
  * @author  Linus Schlepp
- * @version 1.0.0
  */
 public class Main extends Application {
 
@@ -17,10 +17,10 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws IDEException {
 
-        FrontendInit grid = new FrontendInit(primaryStage);
-        grid.init();
+        FrontendInit frontendInit = new FrontendInit(primaryStage);
+        frontendInit.init();
 
 
     }

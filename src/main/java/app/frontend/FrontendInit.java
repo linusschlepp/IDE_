@@ -3,6 +3,7 @@ package app.frontend;
 
 import app.backend.ClassType;
 import app.backend.CustomItem;
+import app.exceptions.IDEException;
 import app.utils.*;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -33,7 +34,7 @@ public class FrontendInit {
      *
      * @param primaryStage mainStage, which is getting passed by the main class
      */
-    public FrontendInit(final Stage primaryStage) {
+    public FrontendInit(final Stage primaryStage) throws IDEException {
         Screen screen = Screen.getPrimary();
         Rectangle2D bounds = screen.getVisualBounds();
         FrontendConstants.primaryStage = primaryStage;
@@ -70,7 +71,13 @@ public class FrontendInit {
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         FrontendConstants.menuItemExec1.setAccelerator(KeyCombination.keyCombination("Ctrl+R"));
-        FrontendConstants.menuItemExec1.setOnAction(e -> CommandUtils.execute());
+        FrontendConstants.menuItemExec1.setOnAction(e -> {
+            try {
+                CommandUtils.execute();
+            } catch (IDEException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         viewMenu = new ImageView(new Image(Objects.requireNonNull(FrontendInit.class.getClassLoader().getResourceAsStream("images/terminateIcon.png"))));
         FrontendConstants.menuClose.setGraphic(viewMenu);
@@ -141,8 +148,12 @@ public class FrontendInit {
         FrontendConstants.menuItemAddProject.setOnAction(e -> {
             try {
                 CommandUtils.addProject();
-            } catch (IOException ex) {
-                LOG.error("Project could not be added");
+            } catch (IOException | IDEException ex) {
+                try {
+                    new IDEException("Project could not be added").throwWithLogging(LOG);
+                } catch (IDEException exc) {
+                    throw new RuntimeException(exc);
+                }
             }
         });
 
@@ -167,8 +178,12 @@ public class FrontendInit {
             try {
                 GitUtils.gitAdd(CommandUtils.getRetTreeItem());
             } catch (IOException ex) {
-                LOG.error("File: [{}] could not be added to Git",
-                        CommandUtils.getRetTreeItem().getValue().getBoxText().getText());
+                try {
+                    new IDEException("File: [{}] could not be added to Git",
+                            CommandUtils.getRetTreeItem().getValue().getBoxText().getText()).throwWithLogging(LOG);
+                } catch (IDEException exc) {
+                    throw new RuntimeException(exc);
+                }
             }
         });
 
@@ -181,7 +196,11 @@ public class FrontendInit {
             try {
                 GitUtils.gitInit(FrontendConstants.path);
             } catch (IOException ex) {
-                LOG.error("Init for path: [{}] was unsuccessful", FrontendConstants.path);
+                try {
+                    new IDEException("Init for path: [{}] was unsuccessful", FrontendConstants.path).throwWithLogging(LOG);
+                } catch (IDEException exc) {
+                    throw new RuntimeException(exc);
+                }
             }
         });
 
@@ -204,7 +223,11 @@ public class FrontendInit {
         FrontendConstants.menuItemSelectProject.setGraphic(viewMenuItem);
         FrontendConstants.menuItemSelectProject.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         FrontendConstants.menuItemSelectProject.setOnAction(e -> {
-            CommandUtils.selectProject();
+            try {
+                CommandUtils.selectProject();
+            } catch (IDEException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
 
@@ -251,7 +274,11 @@ public class FrontendInit {
          */
         FrontendConstants.textArea.textProperty().addListener((observableValue, s, t1) -> {
             tempTreeItem.get().getValue().setText(t1);
-            FileUtils.updateFile(tempTreeItem.get().getValue().getTextArea().getText(), tempTreeItem.get().getValue().getPath());
+            try {
+                FileUtils.updateFile(tempTreeItem.get().getValue().getTextArea().getText(), tempTreeItem.get().getValue().getPath());
+            } catch (IDEException e) {
+                throw new RuntimeException(e);
+            }
             CommandUtils.setImageLabel(tempTreeItem.get());
             FrontendConstants.label.setText(tempTreeItem.get().getValue().getLabelText());
         });

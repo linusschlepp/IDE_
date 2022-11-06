@@ -14,6 +14,9 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ * Utils-class, providing the ability to initialize a git repository, make commits, adding files to the staging area and printing the git log
+ */
 public final class GitUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(GitUtils.class);
