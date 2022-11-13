@@ -1,4 +1,4 @@
-package app.frontend;
+package app.frontend.impl;
 
 
 import app.backend.ClassType;
@@ -90,12 +90,12 @@ public class FrontendInit {
         FrontendConstants.menuItemRename.setGraphic(viewMenuItem);
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
-        FrontendConstants.menuItemRename.setOnAction(e -> RenameBox.display(CommandUtils.getRetTreeItem()));
+        FrontendConstants.menuItemRename.setOnAction(e -> new RenameBox(CommandUtils.getRetTreeItem()).display());
 
 
         viewMenu = new ImageView(new Image(Objects.requireNonNull(FrontendInit.class.getClassLoader().getResourceAsStream("images/terminateIcon.png"))));
         FrontendConstants.menuItemDelete.setGraphic(viewMenu);
-        FrontendConstants.menuItemDelete.setOnAction(e -> DeleteBox.display(CommandUtils.getRetTreeItem()));
+        FrontendConstants.menuItemDelete.setOnAction(e -> new DeleteBox(CommandUtils.getRetTreeItem()).display());
         viewMenu.setFitHeight(20);
         viewMenu.setPreserveRatio(true);
 
@@ -109,7 +109,7 @@ public class FrontendInit {
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         FrontendConstants.menuItemAddClass.setAccelerator(KeyCombination.keyCombination("Ctrl+K"));
-        FrontendConstants.menuItemAddClass.setOnAction(e -> ClassBox.display(ClassType.CLASS, false));
+        FrontendConstants.menuItemAddClass.setOnAction(e -> new ClassBox(new TreeItem<>(new CustomItem(null, null, ClassType.CLASS, "", false))).display());
         FrontendConstants.menuItemAddClass.setGraphic(viewMenuItem);
 
         viewMenuItem = ClassType.INTERFACE.getImage();
@@ -117,7 +117,7 @@ public class FrontendInit {
         viewMenuItem.setPreserveRatio(true);
         FrontendConstants.menuItemAddInterface.setAccelerator(KeyCombination.keyCombination("Ctrl+I"));
         FrontendConstants.menuItemAddInterface.setGraphic(viewMenuItem);
-        FrontendConstants.menuItemAddInterface.setOnAction(e -> ClassBox.display(ClassType.INTERFACE, false));
+        FrontendConstants.menuItemAddInterface.setOnAction(e -> new ClassBox(new TreeItem<>(new CustomItem(null, null, ClassType.INTERFACE, "", false))).display());
 
 
         FrontendConstants.label = new Label();
@@ -129,14 +129,14 @@ public class FrontendInit {
         viewMenuItem.setPreserveRatio(true);
         FrontendConstants.menuItemAddEnum.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
         FrontendConstants.menuItemAddEnum.setGraphic(viewMenuItem);
-        FrontendConstants.menuItemAddEnum.setOnAction(e -> ClassBox.display(ClassType.ENUM, false));
+        FrontendConstants.menuItemAddEnum.setOnAction(e ->  new ClassBox(new TreeItem<>(new CustomItem(null, null, ClassType.ENUM, "", false))).display());
 
         viewMenuItem = ClassType.PACKAGE.getImage();
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         FrontendConstants.menuItemAddPackage.setAccelerator(KeyCombination.keyCombination("Ctrl+P"));
         FrontendConstants.menuItemAddPackage.setGraphic(viewMenuItem);
-        FrontendConstants.menuItemAddPackage.setOnAction(e -> ClassBox.display(ClassType.PACKAGE, true));
+        FrontendConstants.menuItemAddPackage.setOnAction(e -> new ClassBox(new TreeItem<>(new CustomItem(null, null, ClassType.PACKAGE, "", true))).display());
 
 
         viewMenuItem = ClassType.PROJECT.getImage();
@@ -148,10 +148,10 @@ public class FrontendInit {
         FrontendConstants.menuItemAddProject.setOnAction(e -> {
             try {
                 CommandUtils.addProject();
-            } catch (IOException | IDEException ex) {
+            } catch (final IOException | IDEException ex) {
                 try {
                     new IDEException("Project could not be added").throwWithLogging(LOG);
-                } catch (IDEException exc) {
+                } catch (final IDEException exc) {
                     throw new RuntimeException(exc);
                 }
             }
@@ -167,7 +167,7 @@ public class FrontendInit {
         viewMenuItem.setFitHeight(20);
         viewMenuItem.setPreserveRatio(true);
         FrontendConstants.menuItemCommit.setGraphic(viewMenuItem);
-        FrontendConstants.menuItemCommit.setOnAction(e -> CommitBox.display());
+        FrontendConstants.menuItemCommit.setOnAction(e -> new CommitBox().display());
 
         // TODO: Find out, why this image is not added!
         viewMenuItem = new ImageView(new Image(Objects.requireNonNull(FrontendInit.class.getClassLoader().getResourceAsStream("images/plusIcon.png"))));
@@ -177,11 +177,11 @@ public class FrontendInit {
         FrontendConstants.menutItemAddGit.setOnAction(e -> {
             try {
                 GitUtils.gitAdd(CommandUtils.getRetTreeItem());
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 try {
                     new IDEException("File: [{}] could not be added to Git",
-                            CommandUtils.getRetTreeItem().getValue().getBoxText().getText()).throwWithLogging(LOG);
-                } catch (IDEException exc) {
+                            CommandUtils.getRetTreeItem().getValue().getName()).throwWithLogging(LOG);
+                } catch (final IDEException exc) {
                     throw new RuntimeException(exc);
                 }
             }
@@ -250,7 +250,7 @@ public class FrontendInit {
                     FrontendConstants.textArea.setText(newValue.getValue().getTextArea().getText());
             }
             //right-click on TreeItem
-            tempTreeItem.get().getValue().getBoxText().setOnContextMenuRequested(e -> {
+            tempTreeItem.get().getValue().getLabel().setOnContextMenuRequested(e -> {
                 //if TreeItem corresponds to project or package
 
                 CommandUtils.setRetTreeItem(tempTreeItem.get());
@@ -258,7 +258,7 @@ public class FrontendInit {
                         tempTreeItem.get().getValue().getClassType().equals(ClassType.PROJECT)) {
                     FrontendConstants.contextMenuPackages.show(tempTreeItem.get().getValue(), e.getScreenX(), e.getScreenY());
                     if (tempTreeItem.get().getValue().getClassType().equals(ClassType.PACKAGE))
-                        ClassBox.defaultValue = tempTreeItem.get().getValue().getLabelText();
+                        ClassBox.defaultValue = tempTreeItem.get().getValue().getName();
                 }
                 // if TreeItem corresponds to class
                 else
@@ -276,11 +276,11 @@ public class FrontendInit {
             tempTreeItem.get().getValue().setText(t1);
             try {
                 FileUtils.updateFile(tempTreeItem.get().getValue().getTextArea().getText(), tempTreeItem.get().getValue().getPath());
-            } catch (IDEException e) {
+            } catch (final IDEException e) {
                 throw new RuntimeException(e);
             }
             CommandUtils.setImageLabel(tempTreeItem.get());
-            FrontendConstants.label.setText(tempTreeItem.get().getValue().getLabelText());
+            FrontendConstants.label.setText(tempTreeItem.get().getValue().getName());
         });
 
         scene.getStylesheets().add(Constants.ROOT_STYLE_SHEET);

@@ -3,8 +3,8 @@ package app.utils;
 import app.backend.ClassType;
 import app.backend.CustomItem;
 import app.exceptions.IDEException;
-import app.frontend.ClassBox;
-import app.frontend.FrontendInit;
+import app.frontend.impl.ClassBox;
+import app.frontend.impl.FrontendInit;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
@@ -91,17 +91,18 @@ public final class CommandUtils   {
         }
 
 
-        Text projectText = new Text(Constants.HYPHEN + Constants.SPACE_STRING + FrontendConstants.fileName + Constants.SPACE_STRING);
-        projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
-        projectText.setFill(Color.BLACK);
-        Text pathText = new Text(FrontendConstants.path);
-        pathText.setFill(Color.GRAY);
-        pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
+//        Text projectText = new Text(Constants.HYPHEN + Constants.SPACE_STRING + FrontendConstants.fileName + Constants.SPACE_STRING);
+//        projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
+//        projectText.setFill(Color.BLACK);
+//        Text pathText = new Text(FrontendConstants.path);
+//        pathText.setFill(Color.GRAY);
+//        pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
 
 
-        FrontendConstants.textFlow.getChildren().addAll(projectText, pathText);
+//        FrontendConstants.textFlow.getChildren().addAll(projectText, pathText);
+        setProjectText();
         FrontendConstants.gridPane.getChildren().add(FrontendConstants.textFlow);
-        FrontendConstants.TreeItemProject = new TreeItem<>(new CustomItem(ClassType.PROJECT.getImage(), new Label(FrontendConstants.fileName), ClassType.PROJECT, FrontendConstants.path));
+        FrontendConstants.TreeItemProject = new TreeItem<>(new CustomItem(ClassType.PROJECT.getImage(), new Label(FrontendConstants.fileName), ClassType.PROJECT, FrontendConstants.path, true));
         FrontendConstants.treeView.setRoot(FrontendConstants.TreeItemProject);
         recreateRecProject(new File(FrontendConstants.path));
 
@@ -118,7 +119,7 @@ public final class CommandUtils   {
     private static void addClass(File file, ClassType classKind) throws IDEException {
         TextArea tArea = new TextArea(FileUtils.getClassContent(file.getPath()));
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(file.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING)),
-                tArea, file.getPath(), classKind));
+                tArea, file.getPath(), classKind, false));
         FrontendConstants.TreeItemProject.getChildren().add(treeItem);
         FrontendConstants.textAreaStringHashMap.put(tArea, file.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING));
     }
@@ -139,14 +140,14 @@ public final class CommandUtils   {
 
         TreeItem<CustomItem> treeItem;
         if (classKind.equals(ClassType.PACKAGE)) {
-            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), ClassType.PACKAGE, file.getPath()));
+            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), ClassType.PACKAGE, file.getPath(), true));
             FrontendConstants.packageNameHashMap.put(className, treeItem);
             FrontendConstants.packageNameHashMap.get(packageName).getChildren().add(treeItem);
         } else {
             TextArea tArea = new TextArea(FileUtils.getClassContent(file.getPath()));
 
             treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className),
-                    tArea, filePath, classKind));
+                    tArea, filePath, classKind, false));
 
             FrontendConstants.textAreaStringHashMap.put(tArea, className);
             FrontendConstants.packageNameHashMap.get(packageName).getChildren().add(treeItem);
@@ -159,10 +160,10 @@ public final class CommandUtils   {
      *
      * @param packageName name of the package
      */
-    public static void addPackage1(String packageName, File file) {
+    public static void addPackageToTreeView(final String packageName, final File file) {
 
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(ClassType.PACKAGE.getImage(), new Label(packageName),
-                ClassType.PACKAGE, file.getPath()));
+                ClassType.PACKAGE, file.getPath(), true));
         FrontendConstants.packageNameHashMap.put(packageName, treeItem);
         FrontendConstants.TreeItemProject.getChildren().add(treeItem);
 
@@ -193,26 +194,29 @@ public final class CommandUtils   {
     private static void recreateRecProject(final File file) throws IDEException {
 
         if (file.isDirectory()) {
-            if (!file.getName().equals(Constants.OUTPUT_DIR) && !file.getName().equals(Constants.GIT_DIR)) {
+            if (isNeitherOutputNorGitDir(file)) {
                 File[] entries = file.listFiles();
                 if (entries != null) {
                     for (final File entry : entries) {
                         if (file.getPath().equals(FrontendConstants.path)) {
-                            if (entry.isDirectory() && !entry.getName().equals(Constants.OUTPUT_DIR) && !entry.getName().equals(Constants.GIT_DIR))
-                                addPackage1(entry.getName(), entry);
-                            else if (entry.isFile() && !entry.getName().equals(Constants.OUTPUT_DIR) && !entry.getName().equals(Constants.GIT_DIR))
+                            if (entry.isDirectory() && isNeitherOutputNorGitDir(entry)) {
+                                addPackageToTreeView(entry.getName(), entry);
+                            } else if (entry.isFile() && isNeitherOutputNorGitDir(entry)){
                                 addClass(entry, FileUtils.getClassType(entry));
+                            }
                         } else {
-                            if (entry.isDirectory() && !entry.getName().equals(Constants.OUTPUT_DIR) && !entry.getName().equals(Constants.GIT_DIR))
+                            if (entry.isDirectory() && isNeitherOutputNorGitDir(entry)) {
                                 addToPackage(new File(entry.getParent()).getName(),
                                         entry.getPath(), entry.getName(), ClassType.PACKAGE, entry);
-                            else
+                            }  else {
                                 addToPackage(new File(entry.getParent()).getName(), entry.getPath(),
                                         entry.getName().replaceAll(Constants.JAVA_FILE_EXTENSION, Constants.EMPTY_STRING),
                                         FileUtils.getClassType(entry), entry);
+                            }
                         }
-                        if (entry.isDirectory())
+                        if (entry.isDirectory()) {
                             recreateRecProject(entry);
+                        }
                     }
                 }
             }
@@ -225,6 +229,16 @@ public final class CommandUtils   {
             }
 
         }
+    }
+
+    /**
+     * Checks if given file is neither the output or .git directory
+     *
+     * @param file File to be checked
+     * @return
+     */
+    private static boolean isNeitherOutputNorGitDir(final File file) {
+        return file.getName().equals(Constants.OUTPUT_DIR) && !file.getName().equals(Constants.GIT_DIR);
     }
 
     /**
@@ -251,19 +265,35 @@ public final class CommandUtils   {
             }
         } catch (Exception e) {
             if (e instanceof NullPointerException) {
-                FrontendConstants.textFlow = new TextFlow();
-                Text projectText = new Text(Constants.SELECT_FILE);
-                projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
-                projectText.setFill(Color.BLACK);
-                Text pathText = new Text(FrontendConstants.path);
-                pathText.setFill(Color.GRAY);
-                pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
-
-                FrontendConstants.textFlow.getChildren().addAll(projectText, pathText);
+//                FrontendConstants.textFlow = new TextFlow();
+//                Text projectText = new Text(Constants.SELECT_FILE);
+//                projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
+//                projectText.setFill(Color.BLACK);
+//                Text pathText = new Text(FrontendConstants.path);
+//                pathText.setFill(Color.GRAY);
+//                pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
+//
+//                FrontendConstants.textFlow.getChildren().addAll(projectText, pathText);
+                setProjectText();
             } else
                 new IDEException("Path could not be written in currentProject").throwWithLogging(LOG);
         }
         return null;
+    }
+
+
+    /**
+     * Sets text within project
+     */
+    private static void setProjectText() {
+        FrontendConstants.textFlow = new TextFlow();
+        Text projectText = new Text(Constants.SELECT_FILE);
+        projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
+        projectText.setFill(Color.BLACK);
+        Text pathText = new Text(FrontendConstants.path);
+        pathText.setFill(Color.GRAY);
+        pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
+        FrontendConstants.textFlow.getChildren().addAll(projectText, pathText);
     }
 
 
@@ -309,17 +339,19 @@ public final class CommandUtils   {
             Files.createDirectory(Paths.get(FrontendConstants.path));
 
         createProjectFile();
-        FrontendConstants.textFlow = new TextFlow();
-        Text projectText = new Text(Constants.HYPHEN + Constants.SPACE_STRING + FrontendConstants.fileName + Constants.SPACE_STRING);
-        projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
-        projectText.setFill(Color.BLACK);
-        Text pathText = new Text(FrontendConstants.path);
-        pathText.setFill(Color.GRAY);
-        pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
+//        FrontendConstants.textFlow = new TextFlow();
+//        Text projectText = new Text(Constants.HYPHEN + Constants.SPACE_STRING + FrontendConstants.fileName + Constants.SPACE_STRING);
+//        projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
+//        projectText.setFill(Color.BLACK);
+//        Text pathText = new Text(FrontendConstants.path);
+//        pathText.setFill(Color.GRAY);
+//        pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
 
-        FrontendConstants.textFlow.getChildren().addAll(projectText, pathText);
+      //  FrontendConstants.textFlow.getChildren().addAll(projectText, pathText);
+
+        setProjectText();
         FrontendConstants.TreeItemProject = new TreeItem<>(new CustomItem(ClassType.PROJECT.getImage(), new Label(FrontendConstants.fileName),
-                ClassType.PROJECT, FrontendConstants.path));
+                ClassType.PROJECT, FrontendConstants.path, true));
         FrontendConstants.treeView.setRoot(FrontendConstants.TreeItemProject);
 
         LOG.info("Successfully added project");
@@ -335,18 +367,19 @@ public final class CommandUtils   {
         LOG.info("Adding project to stage...");
         FrontendConstants.path = currentPath.getPath();
         FrontendConstants.fileName = currentPath.getName();
-        FrontendConstants.textFlow = new TextFlow();
-        Text projectText = new Text(Constants.HYPHEN + Constants.SPACE_STRING + currentPath.getName() + Constants.SPACE_STRING);
-        projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
-        projectText.setFill(Color.BLACK);
-        Text pathText = new Text(FrontendConstants.path);
-        pathText.setFill(Color.GRAY);
-        pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
-
-
-        FrontendConstants.textFlow.getChildren().addAll(projectText, pathText);
+//        FrontendConstants.textFlow = new TextFlow();
+//        Text projectText = new Text(Constants.HYPHEN + Constants.SPACE_STRING + currentPath.getName() + Constants.SPACE_STRING);
+//        projectText.setFont(Font.font(Constants.CURRENT_FONT, FontWeight.BOLD, FontPosture.REGULAR, 15));
+//        projectText.setFill(Color.BLACK);
+//        Text pathText = new Text(FrontendConstants.path);
+//        pathText.setFill(Color.GRAY);
+//        pathText.setFont(Font.font(Constants.CURRENT_FONT, FontPosture.REGULAR, 15));
+//
+//
+//        FrontendConstants.textFlow.getChildren().addAll(projectText, pathText);
+        setProjectText();
         FrontendConstants.TreeItemProject = new TreeItem<>(new CustomItem(ClassType.PROJECT.getImage(), new Label(currentPath.getName()),
-                ClassType.PROJECT, FrontendConstants.path));
+                ClassType.PROJECT, FrontendConstants.path, true));
         FrontendConstants.treeView.setRoot(FrontendConstants.TreeItemProject);
 
         LOG.info("Successfully added project to stage");
@@ -376,7 +409,7 @@ public final class CommandUtils   {
         TextArea tArea = new TextArea(getClassContent(className, classKind.getClassType()));
         //TreeItem is getting created
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(classKind.getImage(),
-                new Label(className), tArea, FrontendConstants.path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION, classKind));
+                new Label(className), tArea, FrontendConstants.path + Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION, classKind, false));
 
         FrontendConstants.TreeItemProject.getChildren().add(treeItem);
         FrontendConstants.textAreaStringHashMap.put(tArea, className);
@@ -396,7 +429,7 @@ public final class CommandUtils   {
         LOG.info("Adding package: [{}]", packageName);
 
         TreeItem<CustomItem> treeItem = new TreeItem<>(new CustomItem(ClassType.PACKAGE.getImage(),
-                new Label(packageName), ClassType.PACKAGE, file.getPath()));
+                new Label(packageName), ClassType.PACKAGE, file.getPath(), true));
         FrontendConstants.packageNameHashMap.put(packageName, treeItem);
         if (!Files.exists(Paths.get(FrontendConstants.path + Constants.FILE_SEPARATOR + packageName)))
             Files.createDirectory(Paths.get(FrontendConstants.path + Constants.FILE_SEPARATOR + packageName));
@@ -421,7 +454,7 @@ public final class CommandUtils   {
         TreeItem<CustomItem> treeItem;
 
         if (classKind.equals(ClassType.PACKAGE)) {
-            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), ClassType.PACKAGE, file.getPath()));
+            treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className), ClassType.PACKAGE, file.getPath(), true));
             FrontendConstants.packageNameHashMap.put(className, treeItem);
             FrontendConstants.packageNameHashMap.get(packageName).getChildren().add(treeItem);
 
@@ -431,7 +464,7 @@ public final class CommandUtils   {
             TextArea tArea = generateTextAreaContent(packageName, className, classKind);
             treeItem = new TreeItem<>(new CustomItem(classKind.getImage(), new Label(className),
                     tArea, FrontendConstants.path + Constants.FILE_SEPARATOR + packageName +
-                    Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION, classKind));
+                    Constants.FILE_SEPARATOR + className + Constants.JAVA_FILE_EXTENSION, classKind, false));
 
             FrontendConstants.textAreaStringHashMap.put(tArea, className);
             FrontendConstants.packageNameHashMap.get(packageName).getChildren().add(treeItem);
@@ -482,8 +515,8 @@ public final class CommandUtils   {
 
         try {
             while (Objects.nonNull(treeItem.getParent())) {
-                if (!(treeItem.getParent().getValue().getBoxText().getText().equals(FrontendConstants.fileName)))
-                    stringList.add(treeItem.getParent().getValue().getBoxText().getText());
+                if (!(treeItem.getParent().getValue().getName().equals(FrontendConstants.fileName)))
+                    stringList.add(treeItem.getParent().getValue().getName());
                 treeItem = treeItem.getParent();
             }
         } catch (ClassCastException ex) {

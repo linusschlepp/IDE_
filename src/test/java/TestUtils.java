@@ -42,7 +42,7 @@ public final class TestUtils {
     /**
      * Deletes directory for given path
      *
-     * @param dirPath Path, of given direcoty
+     * @param dirPath Path, of given directory
      * @throws IOException If error occurs
      */
     public static void deleteTempDirectory(final String dirPath) throws IOException {

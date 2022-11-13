@@ -2,7 +2,7 @@ package app.utils;
 
 import app.backend.ClassType;
 import app.exceptions.IDEException;
-import app.frontend.FrontendInit;
+import app.frontend.impl.FrontendInit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +71,21 @@ public final class FileUtils {
             new IDEException("File: [{}] already exists and could therefore not be created", path).throwWithLogging(LOG);
         }
     }
+
+    /**
+     * Deletes directory, corresponding to given path
+     *
+     * @param dirPath Path, of directory to be deleted
+     * @throws IOException If error occurs
+     */
+    public static void deleteDirectory(final String dirPath) throws IOException {
+        try (Stream<Path> walk = Files.walk(Paths.get(dirPath))) {
+            walk.sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        }
+    }
+
 
     /**
      * Copies directories the contents of the source-directory into the directory
@@ -206,6 +221,17 @@ public final class FileUtils {
         }
 
         return Constants.EMPTY_STRING;
+    }
+
+    /**
+     * Deletes file, for corresponding to given path
+     *
+     * @param srcPath Path, of the file, which is deleted
+     * @throws IOException If error occurs
+     */
+    public static void deleteFile(final String srcPath) throws IOException {
+
+        Files.delete(Paths.get(srcPath));
     }
 
 
