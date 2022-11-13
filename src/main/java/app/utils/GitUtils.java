@@ -1,7 +1,7 @@
 package app.utils;
 
 import app.backend.CustomItem;
-import app.frontend.AlertBox;
+import app.frontend.impl.AlertBox;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TreeItem;
 import org.slf4j.Logger;
@@ -39,9 +39,10 @@ public final class GitUtils {
             String[] command = new String[]{Constants.CMD, Constants.C, Constants.START, Constants.GIT, Constants.GIT_INIT};
             executeGitCommand(command);
 
-            AlertBox.display(Alert.AlertType.INFORMATION, Constants.INIT_GIT_REPO_SUCCESS);
-        } else
-            AlertBox.display(Alert.AlertType.WARNING, Constants.INIT_GIT_REPO_ALREADY);
+            new AlertBox(Alert.AlertType.INFORMATION, Constants.INIT_GIT_REPO_SUCCESS).display();
+        } else {
+            new AlertBox(Alert.AlertType.WARNING, Constants.INIT_GIT_REPO_ALREADY).display();
+        }
 
     }
 
@@ -70,8 +71,9 @@ public final class GitUtils {
                     "\""};
             executeGitCommand(command);
 
-        } else
-            AlertBox.display(Alert.AlertType.WARNING, Constants.INIT_GIT_REPO_FIRST);
+        } else {
+            new AlertBox(Alert.AlertType.WARNING, Constants.INIT_GIT_REPO_FIRST).display();
+        }
 
         gitLog(FrontendConstants.path);
     }
@@ -99,14 +101,15 @@ public final class GitUtils {
     public static void gitAdd(final TreeItem<CustomItem> treeItem) throws IOException {
 
         if (checkIfInit(FrontendConstants.path)) {
-            String relativePathToAdd = treeItem.getValue().getPath().replace(FrontendConstants.path+Constants.FILE_SEPARATOR,
+            final String relativePathToAdd = treeItem.getValue().getPath().replace(FrontendConstants.path+Constants.FILE_SEPARATOR,
                     Constants.EMPTY_STRING);
 
             String[] command = {Constants.CMD, Constants.C, Constants.START, Constants.GIT, Constants.GIT_ADD, relativePathToAdd};
 
             executeGitCommand(command);
-        } else
-            AlertBox.display(Alert.AlertType.WARNING, Constants.INIT_GIT_REPO_FIRST);
+        } else {
+            new AlertBox(Alert.AlertType.WARNING, Constants.INIT_GIT_REPO_FIRST).display();
+        }
     }
 
 

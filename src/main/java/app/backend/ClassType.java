@@ -1,6 +1,6 @@
 package app.backend;
 
-import app.frontend.FrontendInit;
+import app.frontend.impl.FrontendInit;
 import app.utils.Constants;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

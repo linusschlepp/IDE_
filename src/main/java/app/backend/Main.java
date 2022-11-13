@@ -1,7 +1,7 @@
 package app.backend;
 
 import app.exceptions.IDEException;
-import app.frontend.FrontendInit;
+import app.frontend.impl.FrontendInit;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

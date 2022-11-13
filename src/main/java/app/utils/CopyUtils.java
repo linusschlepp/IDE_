@@ -1,6 +1,6 @@
 package app.utils;
 
-import app.frontend.FrontendInit;
+import app.frontend.impl.FrontendInit;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
